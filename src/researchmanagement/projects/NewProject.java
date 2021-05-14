@@ -3,15 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package researchmanagement.invoices;
+package researchmanagement.projects;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import researchmanagement.Dashboard;
 import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
@@ -21,16 +20,16 @@ import researchmanagement.models.ComboBoxItem;
  *
  * @author robert.watkin
  */
-public class NewInvoice extends javax.swing.JFrame {
+public class NewProject extends javax.swing.JFrame {
 
     private Account loggedIn;
     private DefaultComboBoxModel customerModel = new DefaultComboBoxModel();
-    private DefaultComboBoxModel projectModel = new DefaultComboBoxModel();
+    private DefaultComboBoxModel headResearcherModel = new DefaultComboBoxModel();
     
     /**
      * Creates new form NewAccount
      */
-    public NewInvoice(Account acc) {
+    public NewProject(Account acc) {
         initComponents();
         this.setVisible(true);
         
@@ -65,12 +64,13 @@ public class NewInvoice extends javax.swing.JFrame {
                 // Check for 0 customers
                 if (!rs.isBeforeFirst()){
                     // Display error message
-                    JOptionPane.showMessageDialog(this, "Cannot create invoices as there are no customers\n\nReturning to Invoice Management screen");
+                    JOptionPane.showMessageDialog(this, "Cannot create project as there are no customers\n\nReturning to Dashboard");
 
-                    // return to invoice management screen
-                    InvoiceManagement im = new InvoiceManagement(loggedIn);
-                    im.setVisible(true);
+                    // return to dashboard screen
+                    Dashboard d = new Dashboard(loggedIn);
+                    d.setVisible(true);
                     this.dispose();
+                    return;
                 }
                 
                 // loop through projects and add to model
@@ -84,51 +84,51 @@ public class NewInvoice extends javax.swing.JFrame {
             // Display error message
             JOptionPane.showMessageDialog(this, "An error has occured while retrieving customers\n\n" + e);
             
-            // return to invoice management screen
-            InvoiceManagement im = new InvoiceManagement(loggedIn);
-            im.setVisible(true);
+            // return to dashboard screen
+            Dashboard d = new Dashboard(loggedIn);
+            d.setVisible(true);
             this.dispose();
         }
             
-        // SQL string to get all projects
-        String sqlGetProjects = "SELECT * FROM tbl_projects";
+        // SQL string to get all accounts that are head admins
+        String sqlGetAccounts = "SELECT * FROM tbl_accounts WHERE role = 'Head Researcher'";
         
         // Try with resource for database query
         try (Connection conn = Database.Connect();
                 // prepare statement to run
-                PreparedStatement ps = conn.prepareStatement(sqlGetProjects)){
+                PreparedStatement ps = conn.prepareStatement(sqlGetAccounts)){
                 
                 // result set to store customers
                 ResultSet rs = ps.executeQuery();
                 
                 // remove all from the combo box
-                this.projectSelection.removeAll();
+                this.headResearcherSelection.removeAll();
                 
                 // Check for 0 projects
                 if (!rs.isBeforeFirst()){
                     // Display error message
-                    JOptionPane.showMessageDialog(this, "Cannot create invoices as there are no projects\n\nReturning to Invoice Management screen");
+                    JOptionPane.showMessageDialog(this, "Cannot create project as there are no head researchers\n\nReturning to Dashboard");
 
-                    // return to invoice management screen
-                    InvoiceManagement im = new InvoiceManagement(loggedIn);
-                    im.setVisible(true);
+                    // return to dashboard screen
+                    Dashboard d = new Dashboard(loggedIn);
+                    d.setVisible(true);
                     this.dispose();
                 }
                 
                 // loop through projects and add to model
                 while (rs.next()){
-                    projectModel.addElement(new ComboBoxItem(rs.getInt("ProjectID"), rs.getString("Name")));
+                    headResearcherModel.addElement(new ComboBoxItem(rs.getInt("AccountID"), rs.getString("FirstName") + " " + rs.getString("LastName")));
                 }
                 
                 // add model to the combo box
-                this.projectSelection.setModel(projectModel);
+                this.headResearcherSelection.setModel(headResearcherModel);
         } catch (Exception e){
             // Display error message
             JOptionPane.showMessageDialog(this, "An error has occured while retrieving projects\n\n" + e);
             
-            // return to invoice management screen
-            InvoiceManagement im = new InvoiceManagement(loggedIn);
-            im.setVisible(true);
+            // return to dashboard screen
+            Dashboard d = new Dashboard(loggedIn);
+            d.setVisible(true);
             this.dispose();
         }   
     }
@@ -146,40 +146,30 @@ public class NewInvoice extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        projectSelection = new javax.swing.JComboBox<>();
         customerSelection = new javax.swing.JComboBox<>();
-        jLabel10 = new javax.swing.JLabel();
-        amountOwedField = new javax.swing.JFormattedTextField();
-        amountPaidField = new javax.swing.JFormattedTextField();
         jLabel11 = new javax.swing.JLabel();
-        paymentSelection = new javax.swing.JComboBox<>();
-        createInvoiceButton = new javax.swing.JButton();
+        headResearcherSelection = new javax.swing.JComboBox<>();
+        nameField = new javax.swing.JTextField();
+        createProjectButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel8.setText("Date of Birth");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(300, 400));
-        setMinimumSize(new java.awt.Dimension(300, 400));
-        setResizable(false);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(300, 350));
+        setPreferredSize(new java.awt.Dimension(300, 350));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel1.setText("New Invoice");
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("New Project");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel5.setText("Customer");
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel6.setText("Project");
-
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel7.setText("Amount Owed");
-
-        projectSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jLabel7.setText("Project Name");
 
         customerSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         customerSelection.addActionListener(new java.awt.event.ActionListener() {
@@ -188,40 +178,28 @@ public class NewInvoice extends javax.swing.JFrame {
             }
         });
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel10.setText("Amount Paid");
+        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel11.setText("Head Researcher");
 
-        amountOwedField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getCurrencyInstance())));
-        amountOwedField.addActionListener(new java.awt.event.ActionListener() {
+        nameField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                amountOwedFieldActionPerformed(evt);
+                nameFieldActionPerformed(evt);
             }
         });
-
-        amountPaidField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getCurrencyInstance())));
-
-        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel11.setText("Payment Schedule");
-
-        paymentSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Daily", "Weekly", "Monthly" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(projectSelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(customerSelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(amountOwedField, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(amountPaidField)
+            .addComponent(headResearcherSelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 151, Short.MAX_VALUE))
-            .addComponent(paymentSelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(nameField)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,29 +207,21 @@ public class NewInvoice extends javax.swing.JFrame {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(customerSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(projectSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(amountOwedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(amountPaidField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(paymentSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(headResearcherSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(94, 94, 94))
         );
 
-        createInvoiceButton.setText("Create Invoice");
-        createInvoiceButton.addActionListener(new java.awt.event.ActionListener() {
+        createProjectButton.setText("Create Project");
+        createProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                createInvoiceButtonActionPerformed(evt);
+                createProjectButtonActionPerformed(evt);
             }
         });
 
@@ -274,7 +244,7 @@ public class NewInvoice extends javax.swing.JFrame {
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 14, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(createInvoiceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(createProjectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(cancelButton)))
                 .addContainerGap())
@@ -285,10 +255,10 @@ public class NewInvoice extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 95, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(createInvoiceButton)
+                    .addComponent(createProjectButton)
                     .addComponent(cancelButton))
                 .addContainerGap())
         );
@@ -297,62 +267,57 @@ public class NewInvoice extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
-        InvoiceManagement im = new InvoiceManagement(loggedIn);
-        im.setVisible(true);
+        // return to dashboard screen
+        Dashboard d = new Dashboard(loggedIn);
+        d.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
-
-    private void amountOwedFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amountOwedFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_amountOwedFieldActionPerformed
 
     private void customerSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customerSelectionActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_customerSelectionActionPerformed
 
-    private void createInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createInvoiceButtonActionPerformed
+    private void createProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createProjectButtonActionPerformed
         // prepare sql string
-        String sqlInsert = "INSERT INTO tbl_invoices (Date, AmountOwed, AmountPaid, PaymentSchedule, CustomerID, ProjectID) VALUES (?, ?, ?, ?, ?, ?)";
+        String sqlInsert = "INSERT INTO tbl_projects (Name, Status, CustomerID, HeadResearcherID) VALUES (?, ?, ?, ?)";
             
         // Insert the customer into the database
         try (Connection conn = Database.Connect();
                 PreparedStatement insertPs = conn.prepareStatement(sqlInsert)){
 
-            // get todays date
-            String pattern = "dd/MM/yyyy";
-            String date = new SimpleDateFormat(pattern).format(new Date());
-
+            System.out.println(nameField.getText());
             
             // prepare sql with values
-            insertPs.setString(1, date);
-            insertPs.setString(2, String.valueOf(amountOwedField.getText()));
-            insertPs.setString(3, String.valueOf(amountPaidField.getText())); // dates stored as string as SQLite does not have a date datatype
-            insertPs.setString(4, String.valueOf(paymentSelection.getSelectedItem()));
+            insertPs.setString(1, nameField.getText());
+            insertPs.setString(2, "In Progress");
             
-            // get the selected customer and project from the combo boxes
+            // retrieve selected customer and head researcher
             ComboBoxItem customer = (ComboBoxItem) customerSelection.getSelectedItem();
-            ComboBoxItem project = (ComboBoxItem) projectSelection.getSelectedItem();
+            ComboBoxItem headResearcher = (ComboBoxItem) headResearcherSelection.getSelectedItem();
             
-            // insert customer and project id into prepared statement
-            insertPs.setInt(5, customer.getId());
-            insertPs.setInt(6, project.getId());
-
+            // add IDs to prepared statement
+            insertPs.setInt(3, customer.getId()); 
+            insertPs.setInt(4, headResearcher.getId());
+            
             // execute the sql query
             int row = insertPs.executeUpdate();
-            System.out.println("Invoice inserted into row " + row);
+            System.out.println("Project inserted into row " + row);
                   
-            JOptionPane.showMessageDialog(null, "Create Successful!\n\nReturning to Invoice Management Screen");
+            JOptionPane.showMessageDialog(null, "Create Successful!\n\nReturning to Dashboard");
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save customer!\n\nError: " + e);
         }
         
-        // Return to invoice management screen
-        InvoiceManagement im = new InvoiceManagement(loggedIn);
-        im.setVisible(true);
+        // return to dashboard screen
+        Dashboard d = new Dashboard(loggedIn);
+        d.setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_createInvoiceButtonActionPerformed
+    }//GEN-LAST:event_createProjectButtonActionPerformed
+
+    private void nameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nameFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -371,40 +336,38 @@ public class NewInvoice extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewInvoice.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NewProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewInvoice.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NewProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewInvoice.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NewProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewInvoice.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(NewProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new NewInvoice(new Account(-1, null, null, null, null, null)).setVisible(true);
+                new NewProject(new Account(-1, null, null, null, null, null)).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JFormattedTextField amountOwedField;
-    private javax.swing.JFormattedTextField amountPaidField;
     private javax.swing.JButton cancelButton;
-    private javax.swing.JButton createInvoiceButton;
+    private javax.swing.JButton createProjectButton;
     private javax.swing.JComboBox<String> customerSelection;
+    private javax.swing.JComboBox<String> headResearcherSelection;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JComboBox<String> paymentSelection;
-    private javax.swing.JComboBox<String> projectSelection;
+    private javax.swing.JTextField nameField;
     // End of variables declaration//GEN-END:variables
 }

@@ -5,8 +5,6 @@
  */
 package researchmanagement.invoices;
 
-import researchmanagement.accounts.*;
-import researchmanagement.Dashboard;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
 
@@ -23,6 +21,8 @@ public class EditInvoice extends javax.swing.JFrame {
      */
     public EditInvoice(Account acc) {
         initComponents();
+        this.setVisible(true);
+ 
         
         if (acc.getId() == -1){
             Login l = new Login();
@@ -58,14 +58,14 @@ public class EditInvoice extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel8.setText("Date of Birth");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(300, 400));
         setMinimumSize(new java.awt.Dimension(300, 400));
         setPreferredSize(new java.awt.Dimension(300, 400));
         setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel1.setText("Edit Invoice");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N

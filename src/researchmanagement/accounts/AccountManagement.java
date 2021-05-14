@@ -75,7 +75,7 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
         editAccountButton = new javax.swing.JButton();
         deleteAccountButton = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(800, 500));
         setMinimumSize(new java.awt.Dimension(800, 500));
         setResizable(false);
@@ -382,25 +382,30 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
         allAccountsPanel.removeAll();
         System.out.println(accounts.size() + " accounts found");
 
-        for(Account account : accounts){
-            // create a new row
-            JPanel row = new JPanel(new GridLayout(1,2));
-            row.setMaximumSize(new Dimension(500,30));              
+        if (accounts.size() == 0){
+            JLabel notice = new JLabel("There are currently 0 accounts");
+            allAccountsPanel.add(notice);
+        } else {
+            for(Account account : accounts){
+                // create a new row
+                JPanel row = new JPanel(new GridLayout(1,2));
+                row.setMaximumSize(new Dimension(500,30));              
 
 
-            // name label to hold the accounts name
-            JLabel name = new JLabel(account.getFirstName() + " " + account.getLastName(), SwingConstants.LEFT);
-            name.setSize(200, 20);
+                // name label to hold the accounts name
+                JLabel name = new JLabel(account.getFirstName() + " " + account.getLastName(), SwingConstants.LEFT);
+                name.setSize(200, 20);
 
-            // Button to select the account
-            JButton select = new JButton("Select");
-            select.setActionCommand(Integer.toString(account.getId()));
-            select.addActionListener(this);
+                // Button to select the account
+                JButton select = new JButton("Select");
+                select.setActionCommand(Integer.toString(account.getId()));
+                select.addActionListener(this);
 
-            // Add elements to the row
-            row.add(name);
-            row.add(select);
-            allAccountsPanel.add(row);
+                // Add elements to the row
+                row.add(name);
+                row.add(select);
+                allAccountsPanel.add(row);
+            }
         }
         allAccountsPanel.validate();
         allAccountsPanel.repaint();

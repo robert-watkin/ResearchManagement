@@ -6,6 +6,8 @@
 package researchmanagement;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,15 +21,19 @@ import researchmanagement.accounts.AccountManagement;
 import researchmanagement.customers.CustomerManagement;
 import researchmanagement.invoices.InvoiceManagement;
 import researchmanagement.models.Account;
+import researchmanagement.models.Project;
+import researchmanagement.projects.NewProject;
 
 /**
  *
  * @author robert.watkin
  */
-public class Dashboard extends javax.swing.JFrame {
+public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
     private Account loggedIn;
     private ArrayList<Project> projects;
+    private int selectedProject = -1;
+    private JButton selectedButton;
     /**
      * Creates new form Dashboard
      */
@@ -46,9 +52,15 @@ public class Dashboard extends javax.swing.JFrame {
         nameLabel.setText("Hello, " + loggedIn.getFirstName());
         
         // TODO display inspirational quote
+        System.out.println(loggedIn.getRole());
         
-        // Load projects
-        loadProjects();
+        // Load projects        
+        if (loggedIn.getRole().equals("Head Researcher")){
+            loadProjects();
+        } else {
+            JLabel notice = new JLabel("You can only view projects as a Head Researcher or System Admin");
+            yourProjectsPanel.add(notice);
+        }
             
     }
 
@@ -81,7 +93,7 @@ public class Dashboard extends javax.swing.JFrame {
         newTaskButton = new javax.swing.JButton();
         signOutButton = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(800, 500));
         setMinimumSize(new java.awt.Dimension(800, 500));
         setPreferredSize(new java.awt.Dimension(800, 500));
@@ -95,7 +107,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("<html><p>\"Lorem ipsum dolar sit amet et delectus accommadare his consul copiosae legandos at vix\" - Inspirational Quote, 2021</p></html>\n");
+        jLabel2.setText("<html><p>\"Lorem ipsum dolar sit amet et delectus accommadare his consul copiosae legandos at vix\" - Inspirational Quote, 2021</p></html> ");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -110,8 +122,8 @@ public class Dashboard extends javax.swing.JFrame {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
             .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
         );
 
         jPanel2.setMaximumSize(new java.awt.Dimension(394, 432));
@@ -298,7 +310,7 @@ public class Dashboard extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(48, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         pack();
@@ -306,6 +318,8 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void newProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newProjectButtonActionPerformed
         // TODO add your handling code here:
+        NewProject np = new NewProject(loggedIn);
+        this.dispose();
     }//GEN-LAST:event_newProjectButtonActionPerformed
 
     private void editProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editProjectButtonActionPerformed
@@ -313,7 +327,30 @@ public class Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_editProjectButtonActionPerformed
 
     private void deleteProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteProjectButtonActionPerformed
-        // TODO add your handling code here:
+        if (selectedProject == -1){
+            JOptionPane.showMessageDialog(this, "You must select a project to delete it.\n\nPlease try again");
+            return;
+        }
+        
+        int reply = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete project this project?\n\nThis cannot be undone!", "Warning!", JOptionPane.YES_NO_OPTION);
+        
+        if (reply == JOptionPane.YES_OPTION) {
+            // Sql string to delete project
+            String sqlDeleteProject = "DELETE FROM tbl_projects WHERE projectID=?";
+
+            try (Connection conn = Database.Connect();
+                    PreparedStatement ps = conn.prepareStatement(sqlDeleteProject)){
+                
+                ps.setInt(1, selectedProject);
+
+                ps.executeUpdate();
+                
+                JOptionPane.showMessageDialog(this, "The account has been deleted successfully");
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        loadProjects();
     }//GEN-LAST:event_deleteProjectButtonActionPerformed
 
     private void signOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signOutButtonActionPerformed
@@ -417,21 +454,23 @@ public class Dashboard extends javax.swing.JFrame {
         // Refresh/create array list to store all accounts
         projects = new ArrayList<Project>();
         
-        
+        // TODO allow for ALL projects to be shown to system admins
         // Sql string
-        String sqlGetAccounts = "SELECT * FROM tbl_accounts";
+        String sqlGetAccounts = "SELECT * FROM tbl_projects WHERE HeadResearcherID=?";
         
         // try catch to handle database querying
         try (Connection conn = Database.Connect();
                 PreparedStatement ps = conn.prepareStatement(sqlGetAccounts)){
+            
+            ps.setInt(1, loggedIn.getId());
             
             // Store results from query in a resultset
             ResultSet rs = ps.executeQuery();
             
             // loop through all results and store the account in the accountlist
             while (rs.next()){
-                Account account = new Account(rs.getInt("AccountID"), rs.getString("FirstName"), rs.getString("LastName"),rs.getString("Email"), rs.getString("Role"), rs.getString("DOB"));
-                accounts.add(account);
+                Project project = new Project(rs.getInt("ProjectID"), rs.getString("Name"), rs.getString("Status"),rs.getInt("CustomerID"), rs.getInt("HeadResearcherID"));
+                projects.add(project);
             }
             
             // close resultset and preparedstatment
@@ -447,31 +486,58 @@ public class Dashboard extends javax.swing.JFrame {
         }
             
         // clear the panel
-        allAccountsPanel.removeAll();
-        System.out.println(accounts.size() + " accounts found");
+        yourProjectsPanel.removeAll();
+        System.out.println(projects.size() + " projects found");
+        
+        if (projects.size() == 0){
+            JLabel notice = new JLabel("You currently have 0 projects");
+            yourProjectsPanel.add(notice);
+        } else {
+            for(Project project : projects){
+                // create a new row
+                JPanel row = new JPanel(new GridLayout(1,2));
+                row.setMaximumSize(new Dimension(500,30));              
 
-        for(Account account : accounts){
-            // create a new row
-            JPanel row = new JPanel(new GridLayout(1,2));
-            row.setMaximumSize(new Dimension(500,30));              
 
+                // name label to hold the accounts name
+                JLabel name = new JLabel(project.getName(), SwingConstants.LEFT);
+                name.setSize(200, 20);
 
-            // name label to hold the accounts name
-            JLabel name = new JLabel(account.getFirstName() + " " + account.getLastName(), SwingConstants.LEFT);
-            name.setSize(200, 20);
+                // Button to select the account
+                JButton select = new JButton("Select");
+                select.setActionCommand(Integer.toString(project.getId()));
+                select.addActionListener(this);
 
-            // Button to select the account
-            JButton select = new JButton("Select");
-            select.setActionCommand(Integer.toString(account.getId()));
-            select.addActionListener(this);
-
-            // Add elements to the row
-            row.add(name);
-            row.add(select);
-            allAccountsPanel.add(row);
+                // Add elements to the row
+                row.add(name);
+                row.add(select);
+                yourProjectsPanel.add(row);
+            }
         }
-        allAccountsPanel.validate();
-        allAccountsPanel.repaint();
-        allAccountsPanel.setVisible(true);
+        yourProjectsPanel.validate();
+        yourProjectsPanel.repaint();
+        yourProjectsPanel.setVisible(true);
+    }
+
+    
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+            String action = ae.getActionCommand();
+            System.out.println("Button pressed");
+            
+            selectedProject = Integer.parseInt(action);
+            
+            // if there is already a selected button
+            if (selectedButton != null){
+                // allow the user to select this button again
+                selectedButton.setText("Select");
+                selectedButton.setEnabled(true);
+            }
+            
+            // prevent the user from selecting this button again
+            selectedButton = (JButton) ae.getSource();
+            selectedButton.setText("Selected");
+            selectedButton.setEnabled(false);
+            
     }
 }

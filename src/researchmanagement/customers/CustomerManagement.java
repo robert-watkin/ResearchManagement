@@ -73,7 +73,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
         editCustomerButton = new javax.swing.JButton();
         deleteAccountButton = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(800, 500));
         setMinimumSize(new java.awt.Dimension(800, 500));
         setPreferredSize(new java.awt.Dimension(800, 500));
@@ -266,14 +266,12 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
         int reply = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this account?\n\nThis cannot be undone!", "Warning!", JOptionPane.YES_NO_OPTION);
         
         if (reply == JOptionPane.YES_OPTION) {
-            try {
-                // Sql string to delete account
-                String sqlDeleteAccount = "DELETE FROM tbl_customers WHERE CustomerID=?";
-
-                // establish DB connection
-                Connection conn = Database.Connect();
-
-                PreparedStatement ps = conn.prepareStatement(sqlDeleteAccount);
+            // Sql string to delete account
+            String sqlDeleteAccount = "DELETE FROM tbl_customers WHERE CustomerID=?";
+            
+            try (Connection conn = Database.Connect();
+                    PreparedStatement ps = conn.prepareStatement(sqlDeleteAccount)){
+                // set values in prepared statement
                 ps.setInt(1, selectedCustomer.getId());
 
                 ps.executeUpdate();
@@ -367,30 +365,33 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
         allCustomersPanel.removeAll();
         System.out.println(customers.size() + " accounts found");
 
-        for(Customer customer : customers){
-            // create a new row
-            JPanel row = new JPanel(new GridLayout(1,2));
-            row.setMaximumSize(new Dimension(500,30));              
+        if (customers.size() == 0){
+            JLabel notice = new JLabel("There are currently 0 customers");
+            allCustomersPanel.add(notice);
+        } else {
+            for(Customer customer : customers){
+                // create a new row
+                JPanel row = new JPanel(new GridLayout(1,2));
+                row.setMaximumSize(new Dimension(500,30));              
 
 
-            // name label to hold the customers name
-            JLabel name = new JLabel(customer.getFirstName() + " " + customer.getLastName(), SwingConstants.LEFT);
-            name.setSize(200, 20);
+                // name label to hold the customers name
+                JLabel name = new JLabel(customer.getFirstName() + " " + customer.getLastName(), SwingConstants.LEFT);
+                name.setSize(200, 20);
 
-            // Button to select the account
-            JButton select = new JButton("Select");
-            select.setActionCommand(Integer.toString(customer.getId()));
-            select.addActionListener((ActionListener) this);
+                // Button to select the account
+                JButton select = new JButton("Select");
+                select.setActionCommand(Integer.toString(customer.getId()));
+                select.addActionListener((ActionListener) this);
 
-            row.add(name);
-            row.add(select);
-            allCustomersPanel.add(row);
+                row.add(name);
+                row.add(select);
+                allCustomersPanel.add(row);
+            }
         }
         allCustomersPanel.validate();
         allCustomersPanel.repaint();
         allCustomersPanel.setVisible(true);
-
-        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -72,7 +72,7 @@ public class InvoiceManagement extends javax.swing.JFrame {
         editInvoiceButton = new javax.swing.JButton();
         deleteInvoiceButton = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(800, 500));
         setResizable(false);
 
@@ -378,7 +378,6 @@ public class InvoiceManagement extends javax.swing.JFrame {
     private void newInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newInvoiceButtonActionPerformed
         // TODO add your handling code here:
         NewInvoice ni = new NewInvoice(loggedIn);
-        ni.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_newInvoiceButtonActionPerformed
 
