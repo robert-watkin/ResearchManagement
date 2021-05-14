@@ -172,7 +172,7 @@ public class EditCustomer extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
+        // Open customer management page
         CustomerManagement cm = new CustomerManagement(loggedIn);
         cm.setVisible(true);
         this.dispose();

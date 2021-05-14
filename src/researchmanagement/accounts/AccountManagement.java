@@ -252,7 +252,7 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
     }// </editor-fold>//GEN-END:initComponents
 
     private void dashboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboardButtonActionPerformed
-        // TODO add your handling code here:
+        // open dashboard
         Dashboard d = new Dashboard(loggedIn);
         d.setVisible(true);
         
@@ -304,7 +304,7 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
     }//GEN-LAST:event_deleteAccountButtonActionPerformed
 
     private void newAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newAccountButtonActionPerformed
-        // TODO add your handling code here:
+        // Open new account page
         NewAccount na = new NewAccount(loggedIn);
         na.setVisible(true);
         this.dispose();

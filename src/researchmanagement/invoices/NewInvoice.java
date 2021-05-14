@@ -297,18 +297,18 @@ public class NewInvoice extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
+        // invoice management page
         InvoiceManagement im = new InvoiceManagement(loggedIn);
         im.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void amountOwedFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amountOwedFieldActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_amountOwedFieldActionPerformed
 
     private void customerSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customerSelectionActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_customerSelectionActionPerformed
 
     private void createInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createInvoiceButtonActionPerformed

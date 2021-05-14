@@ -221,7 +221,7 @@ public class EditAccount extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
+        // Open account management page
         AccountManagement am = new AccountManagement(loggedIn);
         am.setVisible(true);
         this.dispose();
@@ -324,11 +324,11 @@ public class EditAccount extends javax.swing.JFrame {
     }//GEN-LAST:event_saveCustomerButtonActionPerformed
 
     private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_passwordFieldActionPerformed
 
     private void confirmPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmPasswordFieldActionPerformed
-        // TODO add your handling code here:
+        // not used      
     }//GEN-LAST:event_confirmPasswordFieldActionPerformed
 
     /**

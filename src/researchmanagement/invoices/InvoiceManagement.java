@@ -376,7 +376,7 @@ public class InvoiceManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteInvoiceButtonActionPerformed
 
     private void newInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newInvoiceButtonActionPerformed
-        // TODO add your handling code here:
+        // open new invoice page
         NewInvoice ni = new NewInvoice(loggedIn);
         this.dispose();
     }//GEN-LAST:event_newInvoiceButtonActionPerformed

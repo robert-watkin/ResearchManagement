@@ -243,7 +243,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
     }// </editor-fold>//GEN-END:initComponents
 
     private void dashboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboardButtonActionPerformed
-        // TODO add your handling code here:
+        // open dashboard
         Dashboard d = new Dashboard(loggedIn);
         d.setVisible(true);
         
@@ -285,7 +285,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
     }//GEN-LAST:event_deleteAccountButtonActionPerformed
 
     private void newCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newCustomerButtonActionPerformed
-        // TODO add your handling code here:
+        // open new customer page
         NewCustomer nc = new NewCustomer(loggedIn);
         nc.setVisible(true);
         

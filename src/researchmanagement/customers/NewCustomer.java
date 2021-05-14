@@ -167,14 +167,14 @@ public class NewCustomer extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
+        // open customer management page
         CustomerManagement cm = new CustomerManagement(loggedIn);
         cm.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void createCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createCustomerButtonActionPerformed
-        // TODO add your handling code here:
+
         
         // email format validation
         if (!Pattern.matches("^[a-zA-Z0-9]+[@]{1}+[a-zA-Z0-9]+[.]{1}+[a-zA-Z0-9]+$", emailField.getText())){

@@ -187,11 +187,11 @@ public class EditInvoice extends javax.swing.JFrame {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void amountOwedFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amountOwedFieldActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_amountOwedFieldActionPerformed
 
     private void editInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editInvoiceButtonActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_editInvoiceButtonActionPerformed
 
     /**

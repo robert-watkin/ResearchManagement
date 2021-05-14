@@ -15,23 +15,27 @@ import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
 import researchmanagement.models.ComboBoxItem;
+import researchmanagement.models.Project;
 
 /**
  *
  * @author robert.watkin
  */
-public class NewProject extends javax.swing.JFrame {
+public class EditProject extends javax.swing.JFrame {
 
     private Account loggedIn;
     private DefaultComboBoxModel customerModel = new DefaultComboBoxModel();
     private DefaultComboBoxModel headResearcherModel = new DefaultComboBoxModel();
+    private int projectId;
+    private Project projectToEdit;
     
     /**
      * Creates new form NewAccount
      */
-    public NewProject(Account acc) {
+    public EditProject(Account acc, int projectId) {
         initComponents();
         this.setVisible(true);
+        this.projectId = projectId;
         
         // check for unauthorised login
         if (acc.getId() == -1){
@@ -41,11 +45,14 @@ public class NewProject extends javax.swing.JFrame {
         }
         loggedIn = acc;
         
+        getProject();
         setValues();
     }
     
     // Sets the values for the combo boxes
     private void setValues(){
+        if (!this.isDisplayable())
+            return;
         
         // SQL string to get all customers
         String sqlGetCustomers = "SELECT * FROM tbl_customers";
@@ -78,6 +85,15 @@ public class NewProject extends javax.swing.JFrame {
                     customerModel.addElement(new ComboBoxItem(rs.getInt("CustomerId"), rs.getString("FirstName") + " " + rs.getString("LastName")));
                 }
                 
+                System.out.println(customerModel.getSize());
+                
+                for (int i = 0; i < customerModel.getSize(); i++){
+                    ComboBoxItem customer = (ComboBoxItem) customerModel.getElementAt(i);
+                    if (customer.getId() == projectToEdit.getCustomerId()){
+                        customerModel.setSelectedItem(customer);
+                    }
+                }
+                
                 // add model to the combo box
                 this.customerSelection.setModel(customerModel);
         } catch (Exception e){
@@ -89,7 +105,11 @@ public class NewProject extends javax.swing.JFrame {
             d.setVisible(true);
             this.dispose();
         }
-            
+        
+        // Set name
+        this.nameField.setText(projectToEdit.getName());
+        
+        
         // SQL string to get all accounts that are head admins
         String sqlGetAccounts = "SELECT * FROM tbl_accounts WHERE role = 'Head Researcher'";
         
@@ -113,11 +133,19 @@ public class NewProject extends javax.swing.JFrame {
                     Dashboard d = new Dashboard(loggedIn);
                     d.setVisible(true);
                     this.dispose();
+                    return;
                 }
                 
                 // loop through projects and add to model
                 while (rs.next()){
                     headResearcherModel.addElement(new ComboBoxItem(rs.getInt("AccountID"), rs.getString("FirstName") + " " + rs.getString("LastName")));
+                }
+                
+                for (int i = 0; i < headResearcherModel.getSize(); i++){
+                    ComboBoxItem headResearcher = (ComboBoxItem) headResearcherModel.getElementAt(i);
+                    if (headResearcher.getId() == projectToEdit.getHeadResearcherId()){
+                        headResearcherModel.setSelectedItem(headResearcher);
+                    }
                 }
                 
                 // add model to the combo box
@@ -151,7 +179,7 @@ public class NewProject extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         headResearcherSelection = new javax.swing.JComboBox<>();
         nameField = new javax.swing.JTextField();
-        createProjectButton = new javax.swing.JButton();
+        saveProjectButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -159,11 +187,10 @@ public class NewProject extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(300, 350));
-        setPreferredSize(new java.awt.Dimension(300, 350));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel1.setText("New Project");
+        jLabel1.setText("Edit Project");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel5.setText("Customer");
@@ -218,10 +245,10 @@ public class NewProject extends javax.swing.JFrame {
                 .addGap(94, 94, 94))
         );
 
-        createProjectButton.setText("Create Project");
-        createProjectButton.addActionListener(new java.awt.event.ActionListener() {
+        saveProjectButton.setText("Save Project");
+        saveProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                createProjectButtonActionPerformed(evt);
+                saveProjectButtonActionPerformed(evt);
             }
         });
 
@@ -244,7 +271,7 @@ public class NewProject extends javax.swing.JFrame {
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 14, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(createProjectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(saveProjectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(cancelButton)))
                 .addContainerGap())
@@ -258,7 +285,7 @@ public class NewProject extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(createProjectButton)
+                    .addComponent(saveProjectButton)
                     .addComponent(cancelButton))
                 .addContainerGap())
         );
@@ -274,49 +301,49 @@ public class NewProject extends javax.swing.JFrame {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void customerSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customerSelectionActionPerformed
-        // not used
+        // TODO add your handling code here:
     }//GEN-LAST:event_customerSelectionActionPerformed
 
-    private void createProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createProjectButtonActionPerformed
-        // prepare sql string
-        String sqlInsert = "INSERT INTO tbl_projects (Name, Status, CustomerID, HeadResearcherID) VALUES (?, ?, ?, ?)";
-            
-        // Insert the customer into the database
+    private void saveProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveProjectButtonActionPerformed
+        // prepare sql string  
+        String sqlUpdate = "UPDATE tbl_projects SET Name=?, CustomerID=?, HeadResearcherID=? WHERE ProjectID=?";           
+                
+        // Insert the account into the database
         try (Connection conn = Database.Connect();
-                PreparedStatement insertPs = conn.prepareStatement(sqlInsert)){
-
+                PreparedStatement insertPs = conn.prepareStatement(sqlUpdate)){
+            
             System.out.println(nameField.getText());
             
-            // prepare sql with values
-            insertPs.setString(1, nameField.getText());
-            insertPs.setString(2, "In Progress");
+            // Populate prepared statement with user input
+            insertPs.setString(1, String.valueOf(nameField.getText()));
             
             // retrieve selected customer and head researcher
             ComboBoxItem customer = (ComboBoxItem) customerSelection.getSelectedItem();
             ComboBoxItem headResearcher = (ComboBoxItem) headResearcherSelection.getSelectedItem();
             
             // add IDs to prepared statement
-            insertPs.setInt(3, customer.getId()); 
-            insertPs.setInt(4, headResearcher.getId());
+            insertPs.setInt(2, customer.getId()); 
+            insertPs.setInt(3, headResearcher.getId());
+            insertPs.setString(4, String.valueOf(projectToEdit.getId()));
             
             // execute the sql query
             int row = insertPs.executeUpdate();
-            System.out.println("Project inserted into row " + row);
+            System.out.println("Project updated at row " + row);
                   
             JOptionPane.showMessageDialog(null, "Create Successful!\n\nReturning to Dashboard");
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Cannot save customer!\n\nError: " + e);
+            JOptionPane.showMessageDialog(null, "Cannot save project!\n\nError: " + e);
         }
         
         // return to dashboard screen
         Dashboard d = new Dashboard(loggedIn);
         d.setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_createProjectButtonActionPerformed
+    }//GEN-LAST:event_saveProjectButtonActionPerformed
 
     private void nameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameFieldActionPerformed
-        // not used
+        // TODO add your handling code here:
     }//GEN-LAST:event_nameFieldActionPerformed
 
     /**
@@ -336,14 +363,18 @@ public class NewProject extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EditProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EditProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EditProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EditProject.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -352,14 +383,13 @@ public class NewProject extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new NewProject(new Account(-1, null, null, null, null, null)).setVisible(true);
+                new EditProject(new Account(-1, null, null, null, null, null), -1).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
-    private javax.swing.JButton createProjectButton;
     private javax.swing.JComboBox<String> customerSelection;
     private javax.swing.JComboBox<String> headResearcherSelection;
     private javax.swing.JLabel jLabel1;
@@ -369,5 +399,40 @@ public class NewProject extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField nameField;
+    private javax.swing.JButton saveProjectButton;
     // End of variables declaration//GEN-END:variables
+
+    private void getProject() {
+        String sqlGetProject = "SELECT * FROM tbl_projects WHERE ProjectID=?";
+        
+        // try with resource for database querying
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlGetProject)){
+            
+            System.out.println(projectId);
+            ps.setInt(1, projectId);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){
+                projectToEdit = new Project(rs.getInt("ProjectID"), rs.getString("Name"), rs.getString("Status"),rs.getInt("CustomerID"), rs.getInt("HeadResearcherID"));     
+            } else {
+                // display error message
+                JOptionPane.showMessageDialog(this, "An error has occured retrieving project data\n\nReturning to dashboard");
+
+                // return to dashboard
+                Dashboard d = new Dashboard(loggedIn);
+                d.setVisible(true);
+                this.dispose();
+            }
+        } catch (Exception e){
+            // display error message
+            JOptionPane.showMessageDialog(this, "An error has occured retrieving project data\n\nReturning to dashboard");
+            
+            // return to dashboard
+            Dashboard d = new Dashboard(loggedIn);
+            d.setVisible(true);
+            this.dispose();
+        }   
+    }
 }

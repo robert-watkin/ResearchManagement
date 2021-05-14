@@ -22,6 +22,7 @@ import researchmanagement.customers.CustomerManagement;
 import researchmanagement.invoices.InvoiceManagement;
 import researchmanagement.models.Account;
 import researchmanagement.models.Project;
+import researchmanagement.projects.EditProject;
 import researchmanagement.projects.NewProject;
 
 /**
@@ -33,7 +34,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     private Account loggedIn;
     private ArrayList<Project> projects;
     private int selectedProject = -1;
-    private JButton selectedButton;
+    private JButton selectedProjectButton;
     /**
      * Creates new form Dashboard
      */
@@ -317,13 +318,19 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     }// </editor-fold>//GEN-END:initComponents
 
     private void newProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newProjectButtonActionPerformed
-        // TODO add your handling code here:
+        // Load new project page
         NewProject np = new NewProject(loggedIn);
         this.dispose();
     }//GEN-LAST:event_newProjectButtonActionPerformed
 
     private void editProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editProjectButtonActionPerformed
-        // TODO add your handling code here:
+        if (selectedProject == -1){
+            JOptionPane.showMessageDialog(this, "You must select a project to delete it.\n\nPlease try again");
+            return;
+        }
+        
+        EditProject ep = new EditProject(loggedIn, selectedProject);
+        this.dispose();
     }//GEN-LAST:event_editProjectButtonActionPerformed
 
     private void deleteProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteProjectButtonActionPerformed
@@ -350,6 +357,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 e.printStackTrace();
             }
         }
+        selectedProject = -1;
         loadProjects();
     }//GEN-LAST:event_deleteProjectButtonActionPerformed
 
@@ -366,11 +374,11 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     }//GEN-LAST:event_signOutButtonActionPerformed
 
     private void newTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newTaskButtonActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_newTaskButtonActionPerformed
 
     private void customerManagementButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customerManagementButtonActionPerformed
-        // TODO add your handling code here:
+        // open customer management page
         CustomerManagement cm = new CustomerManagement(loggedIn);
         cm.setVisible(true);
         
@@ -378,7 +386,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     }//GEN-LAST:event_customerManagementButtonActionPerformed
 
     private void accountManagementButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accountManagementButtonActionPerformed
-        // TODO add your handling code here:
+        // open account management page
         AccountManagement am = new AccountManagement(loggedIn);
         am.setVisible(true);
         
@@ -386,7 +394,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     }//GEN-LAST:event_accountManagementButtonActionPerformed
 
     private void invoiceManagementButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_invoiceManagementButtonActionPerformed
-        // TODO add your handling code here:
+        // Open invoice management page
         InvoiceManagement im = new InvoiceManagement(loggedIn);
         im.setVisible(true);
         
@@ -455,6 +463,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         projects = new ArrayList<Project>();
         
         // TODO allow for ALL projects to be shown to system admins
+        
         // Sql string
         String sqlGetAccounts = "SELECT * FROM tbl_projects WHERE HeadResearcherID=?";
         
@@ -528,16 +537,16 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             selectedProject = Integer.parseInt(action);
             
             // if there is already a selected button
-            if (selectedButton != null){
+            if (selectedProjectButton != null){
                 // allow the user to select this button again
-                selectedButton.setText("Select");
-                selectedButton.setEnabled(true);
+                selectedProjectButton.setText("Select");
+                selectedProjectButton.setEnabled(true);
             }
             
             // prevent the user from selecting this button again
-            selectedButton = (JButton) ae.getSource();
-            selectedButton.setText("Selected");
-            selectedButton.setEnabled(false);
+            selectedProjectButton = (JButton) ae.getSource();
+            selectedProjectButton.setText("Selected");
+            selectedProjectButton.setEnabled(false);
             
     }
 }
