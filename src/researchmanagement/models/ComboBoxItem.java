@@ -13,6 +13,11 @@ public class ComboBoxItem {
     private int id;
     private String name;
 
+    /**
+     *
+     * @param id
+     * @param name
+     */
     public ComboBoxItem(int id, String name) {
         this.id = id;
         this.name = name;

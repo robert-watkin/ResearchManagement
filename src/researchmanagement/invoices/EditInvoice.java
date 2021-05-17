@@ -52,7 +52,7 @@ public class EditInvoice extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         amountOwedField = new javax.swing.JFormattedTextField();
         amountPaidField = new javax.swing.JFormattedTextField();
-        editInvoiceButton = new javax.swing.JButton();
+        saveInvoiceButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -129,10 +129,10 @@ public class EditInvoice extends javax.swing.JFrame {
                 .addComponent(amountPaidField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        editInvoiceButton.setText("Edit Invoice");
-        editInvoiceButton.addActionListener(new java.awt.event.ActionListener() {
+        saveInvoiceButton.setText("Save Invoice");
+        saveInvoiceButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editInvoiceButtonActionPerformed(evt);
+                saveInvoiceButtonActionPerformed(evt);
             }
         });
 
@@ -158,7 +158,7 @@ public class EditInvoice extends javax.swing.JFrame {
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 14, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(editInvoiceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(saveInvoiceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(cancelButton)))
                 .addContainerGap())
@@ -171,7 +171,7 @@ public class EditInvoice extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(editInvoiceButton)
+                    .addComponent(saveInvoiceButton)
                     .addComponent(cancelButton))
                 .addContainerGap())
         );
@@ -190,9 +190,9 @@ public class EditInvoice extends javax.swing.JFrame {
         // not used
     }//GEN-LAST:event_amountOwedFieldActionPerformed
 
-    private void editInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editInvoiceButtonActionPerformed
+    private void saveInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveInvoiceButtonActionPerformed
         // not used
-    }//GEN-LAST:event_editInvoiceButtonActionPerformed
+    }//GEN-LAST:event_saveInvoiceButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -235,7 +235,6 @@ public class EditInvoice extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField amountPaidField;
     private javax.swing.JButton cancelButton;
     private javax.swing.JComboBox<String> customerSelection;
-    private javax.swing.JButton editInvoiceButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel5;
@@ -244,5 +243,6 @@ public class EditInvoice extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JComboBox<String> projectSelection;
+    private javax.swing.JButton saveInvoiceButton;
     // End of variables declaration//GEN-END:variables
 }

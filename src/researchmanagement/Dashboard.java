@@ -1,9 +1,14 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package researchmanagement;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import java.io.InputStream;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -12,6 +17,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -22,9 +28,11 @@ import researchmanagement.customers.CustomerManagement;
 import researchmanagement.invoices.InvoiceManagement;
 import researchmanagement.models.Account;
 import researchmanagement.models.Project;
+import researchmanagement.models.Task;
 import researchmanagement.projects.EditProject;
 import researchmanagement.projects.NewProject;
-
+import researchmanagement.tasks.NewTask;
+import researchmanagement.tasks.ViewTask;
 /**
  *
  * @author robert.watkin
@@ -32,9 +40,15 @@ import researchmanagement.projects.NewProject;
 public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
     private Account loggedIn;
+    
     private ArrayList<Project> projects;
     private int selectedProject = -1;
     private JButton selectedProjectButton;
+    
+    private ArrayList<Task> tasks;
+    private int selectedTask = -1;
+    private JButton selectedTaskButton;
+    
     /**
      * Creates new form Dashboard
      */
@@ -62,7 +76,14 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             JLabel notice = new JLabel("You can only view projects as a Head Researcher or System Admin");
             yourProjectsPanel.add(notice);
         }
-            
+         
+        
+        loadTasks();
+        loadQuote();
+    }
+
+    public Dashboard() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**
@@ -76,7 +97,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
         jPanel1 = new javax.swing.JPanel();
         nameLabel = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        quoteLabel = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         yourProjectsPanel = new javax.swing.JPanel();
@@ -106,9 +127,9 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         nameLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         nameLabel.setText("Hello, Robert");
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("<html><p>\"Lorem ipsum dolar sit amet et delectus accommadare his consul copiosae legandos at vix\" - Inspirational Quote, 2021</p></html> ");
+        quoteLabel.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
+        quoteLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        quoteLabel.setText("<html><p>\"Lorem ipsum dolar sit amet et delectus accommadare his consul copiosae legandos at vix\" - Inspirational Quote, 2021</p></html> ");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -118,13 +139,13 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addContainerGap()
                 .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 594, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(quoteLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 594, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(31, 31, 31))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+            .addComponent(quoteLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
         );
 
         jPanel2.setMaximumSize(new java.awt.Dimension(394, 432));
@@ -374,7 +395,8 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     }//GEN-LAST:event_signOutButtonActionPerformed
 
     private void newTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newTaskButtonActionPerformed
-        // not used
+        NewTask nt = new NewTask(loggedIn);
+        this.dispose();
     }//GEN-LAST:event_newTaskButtonActionPerformed
 
     private void customerManagementButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customerManagementButtonActionPerformed
@@ -443,7 +465,6 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JButton deleteProjectButton;
     private javax.swing.JButton editProjectButton;
     private javax.swing.JButton invoiceManagementButton;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
@@ -453,6 +474,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JLabel nameLabel;
     private javax.swing.JButton newProjectButton;
     private javax.swing.JButton newTaskButton;
+    private javax.swing.JLabel quoteLabel;
     private javax.swing.JButton signOutButton;
     private javax.swing.JPanel yourProjectsPanel;
     private javax.swing.JPanel yourTasksPanel;
@@ -465,11 +487,11 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         // TODO allow for ALL projects to be shown to system admins
         
         // Sql string
-        String sqlGetAccounts = "SELECT * FROM tbl_projects WHERE HeadResearcherID=?";
+        String sqlGetProjects = "SELECT * FROM tbl_projects WHERE HeadResearcherID=?";
         
         // try catch to handle database querying
         try (Connection conn = Database.Connect();
-                PreparedStatement ps = conn.prepareStatement(sqlGetAccounts)){
+                PreparedStatement ps = conn.prepareStatement(sqlGetProjects)){
             
             ps.setInt(1, loggedIn.getId());
             
@@ -529,24 +551,129 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     }
 
     
+    private void loadTasks() {
+        // Refresh/create array list to store all accounts
+        tasks = new ArrayList<Task>();
+        
+        // TODO allow for ALL projects to be shown to system admins
+        
+        // Sql string
+        String sqlGetTasks = "SELECT * FROM tbl_tasks WHERE AccountID=?";
+        
+        // try catch to handle database querying
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlGetTasks)){
+            
+            ps.setInt(1, loggedIn.getId());
+            
+            // Store results from query in a resultset
+            ResultSet rs = ps.executeQuery();
+            
+            // loop through all results and store the account in the accountlist
+            while (rs.next()){
+                Task task = new Task(rs.getInt("TaskID"), rs.getString("Name"), rs.getString("Status"),rs.getInt("ProjectID"), rs.getInt("AccountID"));
+                tasks.add(task);
+            }
+            
+            // close resultset and preparedstatment
+            rs.close();
+        } catch (Exception e){
+            // display error message
+            JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+ 
+            // relaunch login page
+            Login l = new Login();
+            l.setVisible(true);
+            this.dispose();
+        }
+            
+        // clear the panel
+        yourTasksPanel.removeAll();
+        System.out.println(tasks.size() + " tasks found");
+        
+        // if there are 0 tasks
+        if (tasks.size() == 0){
+            // Display 0 tasks to the user
+            JLabel notice = new JLabel("You currently have 0 tasks");
+            yourTasksPanel.add(notice);
+        } else {
+            // Loop through all tasks
+            for(Task task : tasks){
+                // create a new row
+                JPanel row = new JPanel(new GridLayout(1,2));
+                row.setMaximumSize(new Dimension(500,30));              
+
+
+                // name label to hold the accounts name
+                JLabel name = new JLabel(task.getName(), SwingConstants.LEFT);
+                name.setSize(200, 20);
+
+                // Button to select the account
+                JButton view = new JButton("View");
+                view.setActionCommand("-"+task.getId());
+                view.addActionListener(this);
+
+                // Add elements to the row
+                row.add(name);
+                row.add(view);
+                yourTasksPanel.add(row);
+            }
+        }
+        // Refresh the panel holding the tasks
+        yourTasksPanel.validate();
+        yourTasksPanel.repaint();
+        yourTasksPanel.setVisible(true);
+    }
+    
     @Override
     public void actionPerformed(ActionEvent ae) {
             String action = ae.getActionCommand();
             System.out.println("Button pressed");
             
-            selectedProject = Integer.parseInt(action);
+            int val = Integer.parseInt(action);
+            System.out.println(val);
             
-            // if there is already a selected button
-            if (selectedProjectButton != null){
-                // allow the user to select this button again
-                selectedProjectButton.setText("Select");
-                selectedProjectButton.setEnabled(true);
+            if (val > 0){
+                selectedProject = val;
+
+                // if there is already a selected button
+                if (selectedProjectButton != null){
+                    // allow the user to select this button again
+                    selectedProjectButton.setText("Select");
+                    selectedProjectButton.setEnabled(true);
+                }
+
+                // prevent the user from selecting this button again
+                selectedProjectButton = (JButton) ae.getSource();
+                selectedProjectButton.setText("Selected");
+                selectedProjectButton.setEnabled(false);
+            } else {
+                int taskId = val*-1;
+                
+                ViewTask vt = new ViewTask(loggedIn, taskId);
+                this.dispose();
             }
             
-            // prevent the user from selecting this button again
-            selectedProjectButton = (JButton) ae.getSource();
-            selectedProjectButton.setText("Selected");
-            selectedProjectButton.setEnabled(false);
-            
+    }
+
+    private void loadQuote() {
+        String resourceName = "quotes.json";
+        InputStream is = Dashboard.class.getResourceAsStream(resourceName);
+        if (is == null) {
+            throw new NullPointerException("Cannot find resource file " + resourceName);
+        }
+
+        
+        JSONTokener tokener = new JSONTokener(is);
+        JSONObject object = new JSONObject(tokener);
+        
+        Random rand = new Random();
+        JSONArray quotes = object.getJSONArray("quotes");
+        
+        int quoteNum = rand.nextInt(quotes.length());        
+        JSONObject j = (JSONObject) quotes.get(quoteNum);
+        
+        quoteLabel.setText('"'+j.getString("quote")+'"');
+        
     }
 }

@@ -164,7 +164,7 @@
     </Container>
     <Component class="javax.swing.JButton" name="createAccountButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Create Account"/>
+        <Property name="text" type="java.lang.String" value="Save Customer"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="createAccountButtonActionPerformed"/>
