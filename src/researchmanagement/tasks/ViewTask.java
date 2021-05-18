@@ -16,6 +16,8 @@ import researchmanagement.models.Account;
 import researchmanagement.models.Project;
 import researchmanagement.models.Task;
 
+// TODO deleting a task must remove ALL notes for that task and redirect to dashboard
+
 /**
  *
  * @author robert.watkin

@@ -45,7 +45,7 @@
                   <Group type="102" attributes="0">
                       <Component id="editCustomerButton" min="-2" pref="120" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
-                      <Component id="deleteAccountButton" min="-2" pref="120" max="-2" attributes="0"/>
+                      <Component id="deleteCustomerButton" min="-2" pref="120" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Component id="jPanel3" max="32767" attributes="0"/>
@@ -67,7 +67,7 @@
               <EmptySpace pref="43" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="newCustomerButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="deleteAccountButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="deleteCustomerButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="editCustomerButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -277,12 +277,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editCustomerButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="deleteAccountButton">
+    <Component class="javax.swing.JButton" name="deleteCustomerButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Delete"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deleteAccountButtonActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deleteCustomerButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

@@ -23,6 +23,8 @@ import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
 
+// TODO if the loggedIn account is changed on the DB then update it while using the software
+
 /**
  *
  * @author robert.watkin

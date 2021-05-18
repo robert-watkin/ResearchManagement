@@ -33,6 +33,10 @@ import researchmanagement.projects.EditProject;
 import researchmanagement.projects.NewProject;
 import researchmanagement.tasks.NewTask;
 import researchmanagement.tasks.ViewTask;
+
+// TODO display project status and allow the status to be changed appropriately
+// TODO if a project has been deleted, delete related tasks, delete task notes
+
 /**
  *
  * @author robert.watkin
@@ -64,13 +68,10 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         loggedIn = acc;
         
         // display logged in user name
-        nameLabel.setText("Hello, " + loggedIn.getFirstName());
-        
-        // TODO display inspirational quote
-        System.out.println(loggedIn.getRole());
-        
+        nameLabel.setText("Hello, " + loggedIn.getFirstName() + " (" + loggedIn.getRole() + ")");
+     
         // Load projects        
-        if (loggedIn.getRole().equals("Head Researcher")){
+        if (loggedIn.getRole().equals("Head Researcher") || loggedIn.getRole().equals("System Administrator")){
             loadProjects();
         } else {
             JLabel notice = new JLabel("You can only view projects as a Head Researcher or System Admin");
@@ -97,7 +98,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
         jPanel1 = new javax.swing.JPanel();
         nameLabel = new javax.swing.JLabel();
-        quoteLabel = new javax.swing.JLabel();
+        quoteLabel = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         yourProjectsPanel = new javax.swing.JPanel();
@@ -124,28 +125,36 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
         jPanel1.setMaximumSize(new java.awt.Dimension(600, 200));
 
-        nameLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        nameLabel.setText("Hello, Robert");
+        nameLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        nameLabel.setText("Hello, Robert (System Administrator)");
 
-        quoteLabel.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
-        quoteLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        quoteLabel.setText("<html><p>\"Lorem ipsum dolar sit amet et delectus accommadare his consul copiosae legandos at vix\" - Inspirational Quote, 2021</p></html> ");
+        quoteLabel.setEditable(false);
+        quoteLabel.setBackground(new java.awt.Color(200, 200, 200));
+        quoteLabel.setColumns(20);
+        quoteLabel.setLineWrap(true);
+        quoteLabel.setRows(5);
+        quoteLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        quoteLabel.setMaximumSize(new java.awt.Dimension(164, 94));
+        quoteLabel.setMinimumSize(new java.awt.Dimension(164, 94));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(quoteLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 594, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31))
+                .addComponent(quoteLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(quoteLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                    .addComponent(quoteLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(49, 49, 49))
         );
 
         jPanel2.setMaximumSize(new java.awt.Dimension(394, 432));
@@ -244,7 +253,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(editProjectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(deleteProjectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)))
+                        .addComponent(deleteProjectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)))
                 .addGap(0, 0, 0))
         );
         jPanel2Layout.setVerticalGroup(
@@ -290,13 +299,15 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                .addComponent(yourTasksPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createSequentialGroup()
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(176, 176, 176)
-                    .addComponent(newTaskButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-            .addComponent(signOutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(yourTasksPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(190, 190, 190)
+                        .addComponent(newTaskButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(signOutButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -318,21 +329,19 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
 
         pack();
@@ -373,7 +382,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
                 ps.executeUpdate();
                 
-                JOptionPane.showMessageDialog(this, "The account has been deleted successfully");
+                JOptionPane.showMessageDialog(this, "The project has been deleted successfully");
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -474,7 +483,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JLabel nameLabel;
     private javax.swing.JButton newProjectButton;
     private javax.swing.JButton newTaskButton;
-    private javax.swing.JLabel quoteLabel;
+    private javax.swing.JTextArea quoteLabel;
     private javax.swing.JButton signOutButton;
     private javax.swing.JPanel yourProjectsPanel;
     private javax.swing.JPanel yourTasksPanel;
@@ -483,17 +492,25 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     private void loadProjects() {
         // Refresh/create array list to store all accounts
         projects = new ArrayList<Project>();
+        String sqlGetProjects = "";
         
-        // TODO allow for ALL projects to be shown to system admins
+        // allow for ALL projects to be shown to system admins
+        if (loggedIn.getRole().equals("System Administrator")){
+              // Sql string
+            sqlGetProjects = "SELECT * FROM tbl_projects";
+        } else{
+            // Sql string
+            sqlGetProjects = "SELECT * FROM tbl_projects WHERE HeadResearcherID=?";
+        }
         
-        // Sql string
-        String sqlGetProjects = "SELECT * FROM tbl_projects WHERE HeadResearcherID=?";
-        
+     
         // try catch to handle database querying
         try (Connection conn = Database.Connect();
                 PreparedStatement ps = conn.prepareStatement(sqlGetProjects)){
             
-            ps.setInt(1, loggedIn.getId());
+            if (!loggedIn.getRole().equals("System Administrator")){
+                ps.setInt(1, loggedIn.getId());
+            }
             
             // Store results from query in a resultset
             ResultSet rs = ps.executeQuery();
@@ -673,7 +690,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         int quoteNum = rand.nextInt(quotes.length());        
         JSONObject j = (JSONObject) quotes.get(quoteNum);
         
-        quoteLabel.setText('"'+j.getString("quote")+'"');
-        
+        quoteLabel.setText("Quote of the Day: \""+j.getString("quote")+'"');
+       
     }
 }

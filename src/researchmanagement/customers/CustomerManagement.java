@@ -71,7 +71,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
         emailLabel = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         editCustomerButton = new javax.swing.JButton();
-        deleteAccountButton = new javax.swing.JButton();
+        deleteCustomerButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(800, 500));
@@ -196,10 +196,10 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
             }
         });
 
-        deleteAccountButton.setText("Delete");
-        deleteAccountButton.addActionListener(new java.awt.event.ActionListener() {
+        deleteCustomerButton.setText("Delete");
+        deleteCustomerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteAccountButtonActionPerformed(evt);
+                deleteCustomerButtonActionPerformed(evt);
             }
         });
 
@@ -218,7 +218,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(editCustomerButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(deleteAccountButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(deleteCustomerButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())))
@@ -234,7 +234,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(newCustomerButton)
-                    .addComponent(deleteAccountButton)
+                    .addComponent(deleteCustomerButton)
                     .addComponent(editCustomerButton))
                 .addContainerGap())
         );
@@ -257,13 +257,14 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
         this.dispose();
     }//GEN-LAST:event_editCustomerButtonActionPerformed
 
-    private void deleteAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteAccountButtonActionPerformed
+    private void deleteCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteCustomerButtonActionPerformed
         if (selectedCustomer == null){
             JOptionPane.showMessageDialog(this, "You must select an account to delete it.\n\nPlease try again");
             return;
         }
         
         int reply = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this account?\n\nThis cannot be undone!", "Warning!", JOptionPane.YES_NO_OPTION);
+        System.out.println(reply);
         
         if (reply == JOptionPane.YES_OPTION) {
             // Sql string to delete account
@@ -282,7 +283,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
             }
         }
         loadCustomers();
-    }//GEN-LAST:event_deleteAccountButtonActionPerformed
+    }//GEN-LAST:event_deleteCustomerButtonActionPerformed
 
     private void newCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newCustomerButtonActionPerformed
         // open new customer page
@@ -398,7 +399,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
     private javax.swing.JLabel DOBLabel;
     private javax.swing.JPanel allCustomersPanel;
     private javax.swing.JButton dashboardButton;
-    private javax.swing.JButton deleteAccountButton;
+    private javax.swing.JButton deleteCustomerButton;
     private javax.swing.JButton editCustomerButton;
     private javax.swing.JLabel emailLabel;
     private javax.swing.JLabel jLabel1;
@@ -414,43 +415,41 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-            String action = ae.getActionCommand();
-            System.out.println("Button pressed");
-            
-            // SQL string
-            String sqlGetAccount = "SELECT * FROM tbl_customers WHERE CustomerID=?";
-                
-            try (Connection conn = Database.Connect();
-                PreparedStatement ps = conn.prepareStatement(sqlGetAccount)){
-                int accountId = Integer.parseInt(action);
-                
-                ps.setInt(1, accountId);
-                
-                ResultSet rs = ps.executeQuery();
+        String action = ae.getActionCommand();
+        System.out.println("Button pressed");
 
-                if (rs.next()){
-                    selectedCustomer = new Customer(rs.getInt("CustomerID"),rs.getString("FirstName"),rs.getString("LastName"),rs.getString("Email"),rs.getString("DOB"));
-                    nameLabel.setText(selectedCustomer.getFirstName() + " " + selectedCustomer.getLastName());
-                    emailLabel.setText(selectedCustomer.getEmail());
-                    DOBLabel.setText(selectedCustomer.getDOB());
-                } else{
-                    JOptionPane.showMessageDialog(this, "There has been a problem retrieving this account\n\nPlease try again");
-                }
-                
-                // close resultset
-                rs.close();
-                 
-                
-            } catch (Exception e){
-                // display error message
-                JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
-                
-                // relaunch login page
-                Login l = new Login();
-                l.setVisible(true);
-                this.dispose();
+        // SQL string
+        String sqlGetAccount = "SELECT * FROM tbl_customers WHERE CustomerID=?";
+
+        try (Connection conn = Database.Connect();
+            PreparedStatement ps = conn.prepareStatement(sqlGetAccount)){
+            int accountId = Integer.parseInt(action);
+
+            ps.setInt(1, accountId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()){
+                selectedCustomer = new Customer(rs.getInt("CustomerID"),rs.getString("FirstName"),rs.getString("LastName"),rs.getString("Email"),rs.getString("DOB"));
+                nameLabel.setText(selectedCustomer.getFirstName() + " " + selectedCustomer.getLastName());
+                emailLabel.setText(selectedCustomer.getEmail());
+                DOBLabel.setText(selectedCustomer.getDOB());
+            } else{
+                JOptionPane.showMessageDialog(this, "There has been a problem retrieving this account\n\nPlease try again");
             }
-            
-            // TODO populate requested projects
+
+            // close resultset
+            rs.close();
+
+
+        } catch (Exception e){
+            // display error message
+            JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+
+            // relaunch login page
+            Login l = new Login();
+            l.setVisible(true);
+            this.dispose();
+        }
     }
 }

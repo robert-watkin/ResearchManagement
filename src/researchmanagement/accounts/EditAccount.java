@@ -304,8 +304,7 @@ public class EditAccount extends javax.swing.JFrame {
                 insertPs.setString(7, String.valueOf(accToEdit.getId()));
             }
             else{
-                insertPs.setString(7, String.valueOf(accToEdit.getId()));
-            
+                insertPs.setString(6, String.valueOf(accToEdit.getId()));
             }
             
             // execute the sql query

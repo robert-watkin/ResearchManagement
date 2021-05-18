@@ -17,6 +17,8 @@ import researchmanagement.Login;
 import researchmanagement.models.Account;
 import researchmanagement.models.ComboBoxItem;
 
+
+// TODO fix formatted field (for both new and edit)
 /**
  *
  * @author robert.watkin
