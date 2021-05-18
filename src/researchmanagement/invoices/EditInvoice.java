@@ -8,6 +8,8 @@ package researchmanagement.invoices;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
 
+// TODO pretty much this whole class needs rewritten
+
 /**
  *
  * @author robert.watkin
