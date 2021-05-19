@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -35,7 +36,6 @@ import researchmanagement.tasks.NewTask;
 import researchmanagement.tasks.ViewTask;
 
 // TODO display project status and allow the status to be changed appropriately
-// TODO if a project has been deleted, delete related tasks, delete task notes
 
 /**
  *
@@ -253,8 +253,8 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(editProjectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(deleteProjectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)))
-                .addGap(0, 0, 0))
+                        .addComponent(deleteProjectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -330,8 +330,9 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(2, 2, 2)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -340,8 +341,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(46, Short.MAX_VALUE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         pack();
@@ -368,27 +368,99 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             JOptionPane.showMessageDialog(this, "You must select a project to delete it.\n\nPlease try again");
             return;
         }
-        
+       
         int reply = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete project this project?\n\nThis cannot be undone!", "Warning!", JOptionPane.YES_NO_OPTION);
         
         if (reply == JOptionPane.YES_OPTION) {
             // Sql string to delete project
-            String sqlDeleteProject = "DELETE FROM tbl_projects WHERE projectID=?";
+            boolean projectDeleted = false;
+            String sqlDeleteProject = "DELETE FROM tbl_projects WHERE ProjectID=?";
 
+            // try with resource to update database
             try (Connection conn = Database.Connect();
                     PreparedStatement ps = conn.prepareStatement(sqlDeleteProject)){
+                
+                ps.setInt(1, selectedProject);
+                ps.executeUpdate();
+                
+                projectDeleted = true;
+                
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            
+            
+            // get task ID for deleting notes
+            int[] taskIds = {};
+            String sqlGetTaskID = "SELECT TaskID FROM tbl_tasks WHERE ProjectID=?";
+
+            try (Connection conn = Database.Connect();
+                    PreparedStatement ps = conn.prepareStatement(sqlGetTaskID)){
+                
+                ps.setInt(1, selectedProject);
+                ResultSet rs = ps.executeQuery();
+                
+                boolean isTasks = false;
+                // check if resultset is empty
+                if (rs.isBeforeFirst()){
+                    isTasks = true;
+                }
+                
+                // get all task IDs
+                if (isTasks){
+                    while (rs.next()){
+                        taskIds = Arrays.copyOf(taskIds, taskIds.length + 1);
+                        taskIds[taskIds.length - 1] = rs.getInt("TaskID"); 
+                    }
+                }
+                
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            
+            // delete tasks
+            boolean tasksDeleted = false;
+            String sqlDeleteTasks = "DELETE FROM tbl_tasks WHERE ProjectID=?";
+
+            try (Connection conn = Database.Connect();
+                    PreparedStatement ps = conn.prepareStatement(sqlDeleteTasks)){
                 
                 ps.setInt(1, selectedProject);
 
                 ps.executeUpdate();
                 
-                JOptionPane.showMessageDialog(this, "The project has been deleted successfully");
+                tasksDeleted = true;
+                
             } catch (Exception e){
                 e.printStackTrace();
+            }
+            
+            // delete task notse
+            if (tasksDeleted){
+                for (int id : taskIds){
+                    String sqlDeleteNote = "DELETE FROM tbl_notes WHERE TaskID=?";
+
+                    try (Connection conn = Database.Connect();
+                            PreparedStatement ps = conn.prepareStatement(sqlDeleteNote)){
+
+                        ps.setInt(1, id);
+
+                        ps.executeUpdate();
+                        
+                        
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+            
+            if (projectDeleted){
+                JOptionPane.showMessageDialog(this, "The project has been deleted successfully");
             }
         }
         selectedProject = -1;
         loadProjects();
+        loadTasks();
     }//GEN-LAST:event_deleteProjectButtonActionPerformed
 
     private void signOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signOutButtonActionPerformed
@@ -572,16 +644,24 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         // Refresh/create array list to store all accounts
         tasks = new ArrayList<Task>();
         
-        // TODO allow for ALL projects to be shown to system admins
+        String sqlGetTasks = "";
         
-        // Sql string
-        String sqlGetTasks = "SELECT * FROM tbl_tasks WHERE AccountID=?";
+        if (loggedIn.getRole().equals("System Administrator")){
+             // Sql string
+             sqlGetTasks = "SELECT * FROM tbl_tasks";
+        } else {
+            // Sql string
+             sqlGetTasks = "SELECT * FROM tbl_tasks WHERE AccountID=?";
+        }
+        
         
         // try catch to handle database querying
         try (Connection conn = Database.Connect();
                 PreparedStatement ps = conn.prepareStatement(sqlGetTasks)){
             
-            ps.setInt(1, loggedIn.getId());
+            if (!loggedIn.getRole().equals("System Administrator")){
+                ps.setInt(1, loggedIn.getId());
+            }
             
             // Store results from query in a resultset
             ResultSet rs = ps.executeQuery();
@@ -679,7 +759,6 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         if (is == null) {
             throw new NullPointerException("Cannot find resource file " + resourceName);
         }
-
         
         JSONTokener tokener = new JSONTokener(is);
         JSONObject object = new JSONObject(tokener);

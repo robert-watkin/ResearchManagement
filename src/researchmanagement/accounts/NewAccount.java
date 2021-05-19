@@ -321,7 +321,7 @@ public class NewAccount extends javax.swing.JFrame {
     }//GEN-LAST:event_createAccountButtonActionPerformed
 
     private void roleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roleComboBoxActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_roleComboBoxActionPerformed
 
     /**

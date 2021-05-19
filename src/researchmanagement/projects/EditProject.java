@@ -301,7 +301,7 @@ public class EditProject extends javax.swing.JFrame {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void customerSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customerSelectionActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_customerSelectionActionPerformed
 
     private void saveProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveProjectButtonActionPerformed
@@ -343,7 +343,7 @@ public class EditProject extends javax.swing.JFrame {
     }//GEN-LAST:event_saveProjectButtonActionPerformed
 
     private void nameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameFieldActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_nameFieldActionPerformed
 
     /**

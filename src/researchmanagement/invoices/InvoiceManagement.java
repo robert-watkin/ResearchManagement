@@ -5,20 +5,31 @@
  */
 package researchmanagement.invoices;
 
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import researchmanagement.Dashboard;
 import researchmanagement.Database;
+import researchmanagement.Login;
 import researchmanagement.models.Account;
 import researchmanagement.models.Invoice;
+import researchmanagement.models.Project;
 
 /**
  *
  * @author robert.watkin
  */
-public class InvoiceManagement extends javax.swing.JFrame {
+public class InvoiceManagement extends javax.swing.JFrame implements ActionListener{
 
     private Account loggedIn;
     private Invoice selectedInvoice;
@@ -34,6 +45,8 @@ public class InvoiceManagement extends javax.swing.JFrame {
         initComponents();
         
         this.loggedIn = loggedIn;
+        
+        loadInvoices();
     }
 
     /**
@@ -52,28 +65,30 @@ public class InvoiceManagement extends javax.swing.JFrame {
         newInvoiceButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        invoiceIdLabel = new javax.swing.JLabel();
+        customerIdLabel = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
+        dateLabel = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
+        customerNameLabel = new javax.swing.JLabel();
+        projectIdLabel = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
+        projectNameLabel = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
+        amountOwedLabel = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
-        jLabel20 = new javax.swing.JLabel();
+        amountPaidLabel = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
+        paymentScheduleLabel = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel();
         editInvoiceButton = new javax.swing.JButton();
         deleteInvoiceButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(800, 500));
+        setMaximumSize(new java.awt.Dimension(800, 470));
+        setMinimumSize(new java.awt.Dimension(800, 470));
+        setPreferredSize(new java.awt.Dimension(800, 470));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
@@ -112,6 +127,9 @@ public class InvoiceManagement extends javax.swing.JFrame {
         );
 
         allInvoicesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("All Invoices"));
+        allInvoicesPanel.setMaximumSize(new java.awt.Dimension(371, 344));
+        allInvoicesPanel.setMinimumSize(new java.awt.Dimension(371, 344));
+        allInvoicesPanel.setPreferredSize(new java.awt.Dimension(371, 344));
         allInvoicesPanel.setLayout(new javax.swing.BoxLayout(allInvoicesPanel, javax.swing.BoxLayout.Y_AXIS));
 
         newInvoiceButton.setText("New Invoice");
@@ -124,17 +142,17 @@ public class InvoiceManagement extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel2.setText("Invoice ID");
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel3.setText("3");
+        invoiceIdLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        invoiceIdLabel.setText("null");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel4.setText("13");
+        customerIdLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        customerIdLabel.setText("null");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel5.setText("Customer ID");
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel10.setText("3");
+        dateLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        dateLabel.setText("null");
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel11.setText("Date");
@@ -142,35 +160,35 @@ public class InvoiceManagement extends javax.swing.JFrame {
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel12.setText("Customer Name");
 
-        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel13.setText("John Doe");
+        customerNameLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        customerNameLabel.setText("null");
 
-        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel14.setText("32");
+        projectIdLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        projectIdLabel.setText("null");
 
         jLabel15.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel15.setText("Project ID");
 
-        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel16.setText("John Doe");
+        projectNameLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        projectNameLabel.setText("null");
 
         jLabel17.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel17.setText("Project Name");
 
-        jLabel18.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel18.setText("£52.32");
+        amountOwedLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        amountOwedLabel.setText("null");
 
         jLabel19.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel19.setText("Amount Owed");
 
-        jLabel20.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel20.setText("£52.32");
+        amountPaidLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        amountPaidLabel.setText("null");
 
         jLabel21.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel21.setText("Amount Paid");
 
-        jLabel22.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel22.setText("Monthly");
+        paymentScheduleLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        paymentScheduleLabel.setText("null");
 
         jLabel23.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel23.setText("Payment Schedule");
@@ -184,37 +202,36 @@ public class InvoiceManagement extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(customerIdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(invoiceIdLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(customerNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(projectIdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(projectNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel18, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel19, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel20, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel22, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(paymentScheduleLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel19, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(amountOwedLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(amountPaidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -225,45 +242,45 @@ public class InvoiceManagement extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(invoiceIdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(dateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(customerIdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(customerNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(projectIdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(projectNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(amountOwedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(amountPaidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2)
-                .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(paymentScheduleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(63, Short.MAX_VALUE))
         );
 
@@ -285,24 +302,20 @@ public class InvoiceManagement extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(newInvoiceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(allInvoicesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(allInvoicesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(editInvoiceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(144, 144, 144)
                         .addComponent(deleteInvoiceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -317,14 +330,14 @@ public class InvoiceManagement extends javax.swing.JFrame {
                     .addComponent(newInvoiceButton)
                     .addComponent(editInvoiceButton)
                     .addComponent(deleteInvoiceButton))
-                .addContainerGap())
+                .addContainerGap(50, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void dashboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboardButtonActionPerformed
-        // TODO add your handling code here:
+        // Open dashboard
         Dashboard d = new Dashboard(loggedIn);
         d.setVisible(true);
         
@@ -338,13 +351,12 @@ public class InvoiceManagement extends javax.swing.JFrame {
             return;
         }
         
-        EditInvoice ei = new EditInvoice(loggedIn);
+        EditInvoice ei = new EditInvoice(loggedIn, selectedInvoice);
         ei.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_editInvoiceButtonActionPerformed
 
     private void deleteInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteInvoiceButtonActionPerformed
-        // TODO add your handling code here:
         // Check if an account has been selected
         if (selectedInvoice == null){
             JOptionPane.showMessageDialog(this, "You must select an invoice to delete it.\n\nPlease try again");
@@ -419,34 +431,199 @@ public class InvoiceManagement extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel allInvoicesPanel;
+    private javax.swing.JLabel amountOwedLabel;
+    private javax.swing.JLabel amountPaidLabel;
+    private javax.swing.JLabel customerIdLabel;
+    private javax.swing.JLabel customerNameLabel;
     private javax.swing.JButton dashboardButton;
+    private javax.swing.JLabel dateLabel;
     private javax.swing.JButton deleteInvoiceButton;
     private javax.swing.JButton editInvoiceButton;
+    private javax.swing.JLabel invoiceIdLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JButton newInvoiceButton;
+    private javax.swing.JLabel paymentScheduleLabel;
+    private javax.swing.JLabel projectIdLabel;
+    private javax.swing.JLabel projectNameLabel;
     // End of variables declaration//GEN-END:variables
 
     private void loadInvoices() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // Refresh/create array list to store all invoices
+        invoices = new ArrayList<Invoice>();
+        
+        // Sql string
+        String sqlGetAccounts = "SELECT * FROM tbl_invoices";
+        
+        // try catch to handle database querying
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlGetAccounts)){
+            
+            // Store results from query in a resultset
+            ResultSet rs = ps.executeQuery();
+            
+            // loop through all results and store the invoice in the invoice list
+            while (rs.next()){
+                Invoice invoice = new Invoice(rs.getInt("InvoiceID"), rs.getInt("CustomerID"), rs.getInt("ProjectID"), rs.getString("Date"),  rs.getString("AmountPaid"), rs.getString("AmountOwed"),rs.getString("PaymentSchedule"));
+                invoices.add(invoice);
+            }
+            
+            // close resultset and preparedstatment
+            rs.close();
+        } catch (Exception e){
+            // display error message
+            JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+ 
+            // relaunch login page
+            Login l = new Login();
+            l.setVisible(true);
+            this.dispose();
+        }
+        
+        // clear the panel
+        allInvoicesPanel.removeAll();
+        System.out.println(invoices.size() + " accounts found");
+
+        if (invoices.size() == 0){
+            JLabel notice = new JLabel("There are currently 0 projects for this customer");
+            allInvoicesPanel.add(notice);
+        } else {
+            for(Invoice invoice : invoices){
+                // create a new row
+                JPanel row = new JPanel(new GridLayout(1,2));
+                row.setMaximumSize(new Dimension(500,30));              
+
+
+                // name label to hold the customers name
+                JLabel name = new JLabel("Invoice ID: " + invoice.getId() + "; Date: " + invoice.getDate(), SwingConstants.LEFT);
+                name.setSize(200, 20);
+
+                // Button to select the account
+                JButton select = new JButton("Select");
+                select.setActionCommand(Integer.toString(invoice.getId()));
+                select.addActionListener(this);
+
+                row.add(name);
+                row.add(select);
+                allInvoicesPanel.add(row);
+            }
+        }
+        allInvoicesPanel.validate();
+        allInvoicesPanel.repaint();
+        allInvoicesPanel.setVisible(true);   
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        String action = ae.getActionCommand();
+        System.out.println("Button pressed");
+
+        // SQL string
+        String sqlGetInvoice = "SELECT * FROM tbl_invoices WHERE InvoiceID=?";
+
+        try (Connection conn = Database.Connect();
+            PreparedStatement ps = conn.prepareStatement(sqlGetInvoice)){
+            int accountId = Integer.parseInt(action);
+
+            ps.setInt(1, accountId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()){
+                selectedInvoice = new Invoice(rs.getInt("InvoiceID"), rs.getInt("CustomerID"), rs.getInt("ProjectID"), rs.getString("Date"),  rs.getString("AmountPaid"), rs.getString("AmountOwed"),rs.getString("PaymentSchedule"));
+            } else{
+                JOptionPane.showMessageDialog(this, "There has been a problem retrieving this account\n\nPlease try again");
+            }
+
+            // close resultset
+            rs.close();
+        } catch (Exception e){
+            // display error message
+            JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+
+            // relaunch login page
+            Login l = new Login();
+            l.setVisible(true);
+            this.dispose();
+        }   
+        
+        // SQL string
+        String sqlGetCustomer = "SELECT * FROM tbl_customers WHERE CustomerID=?";
+        String customerName = "";
+        
+        try (Connection conn = Database.Connect();
+            PreparedStatement ps = conn.prepareStatement(sqlGetCustomer)){
+
+            ps.setInt(1, selectedInvoice.getCustomerId());
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()){
+                customerName = rs.getString("FirstName") + " " + rs.getString("LastName");
+            } else{
+                JOptionPane.showMessageDialog(this, "There has been a problem retrieving customer details\n\nPlease try again");
+            }
+
+            // close resultset
+            rs.close();
+        } catch (Exception e){
+            // display error message
+            JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+
+            // relaunch login page
+            Login l = new Login();
+            l.setVisible(true);
+            this.dispose();
+        }   
+        
+        // SQL string
+        String sqlGetProject = "SELECT * FROM tbl_projects WHERE ProjectID=?";
+        String projectName = "";
+        
+        try (Connection conn = Database.Connect();
+            PreparedStatement ps = conn.prepareStatement(sqlGetProject)){
+
+            ps.setInt(1, selectedInvoice.getProjectId());
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()){
+                projectName = rs.getString("Name");
+            } else{
+                JOptionPane.showMessageDialog(this, "There has been a problem retrieving project details\n\nPlease try again");
+            }
+
+            // close resultset
+            rs.close();
+        } catch (Exception e){
+            // display error message
+            JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+
+            // relaunch login page
+            Login l = new Login();
+            l.setVisible(true);
+            this.dispose();
+        }   
+        
+        // display values on screen
+        this.invoiceIdLabel.setText(String.valueOf(selectedInvoice.getId()));
+        this.dateLabel.setText(selectedInvoice.getDate());
+        this.customerIdLabel.setText(String.valueOf(selectedInvoice.getCustomerId()));
+        this.customerNameLabel.setText(customerName);
+        this.projectIdLabel.setText(String.valueOf(selectedInvoice.getProjectId()));
+        this.projectNameLabel.setText(projectName);
+        this.amountOwedLabel.setText(selectedInvoice.getAmountOwed());
+        this.amountPaidLabel.setText(selectedInvoice.getAmountPaid());
+        this.paymentScheduleLabel.setText(selectedInvoice.getPaymentSchedule());
     }
 }

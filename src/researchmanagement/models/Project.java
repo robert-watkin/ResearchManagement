@@ -17,7 +17,14 @@ public class Project {
     private int customerId;
     private int headResearcherId;
 
-    // CONSTRUCTOR
+    /**
+     *
+     * @param id
+     * @param name
+     * @param status
+     * @param customerId
+     * @param headResearcherId
+     */
     public Project(int id, String name, String status, int customerId, int headResearcherId) {
         this.id = id;
         this.name = name;

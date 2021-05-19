@@ -316,6 +316,15 @@ public class EditAccount extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save account!\n\nError: " + e);
         }
+        
+        // check if the edited account is the account logged in
+        if (accToEdit.getId() == loggedIn.getId()){
+            loggedIn.setFirstName(firstNameField.getText());
+            loggedIn.setLastName(lastNameField.getText());
+            loggedIn.setDOB(DOBField.getText());
+            loggedIn.setEmail(emailField.getText());
+            loggedIn.setRole(String.valueOf(roleComboBox.getSelectedItem()));
+        }
 
         AccountManagement am = new AccountManagement(loggedIn);
         am.setVisible(true);

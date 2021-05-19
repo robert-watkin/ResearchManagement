@@ -300,7 +300,7 @@ public class ViewTask extends javax.swing.JFrame {
     }//GEN-LAST:event_editTaskButtonActionPerformed
 
     private void addNoteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNoteButtonActionPerformed
-        // TODO
+        // add a note
         String note = noteTextArea.getText();
         
         String sqlInsertNote = "INSERT INTO tbl_notes (Note, TaskID) VALUES (?, ?)";
@@ -344,11 +344,35 @@ public class ViewTask extends javax.swing.JFrame {
                 
                 ps.executeUpdate();
                 
-                JOptionPane.showMessageDialog(this, "The account has been deleted successfully");
             } catch (Exception e){
                 JOptionPane.showMessageDialog(this, "There has been an error deleting this account\n"+e+"\nPlease try again");
+                return;
             }
         }
+        
+        // Delete tasks
+        String sqlDeleteNote = "DELETE FROM tbl_notes WHERE TaskID=?";
+
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlDeleteNote)){
+
+            ps.setInt(1, selectedTask.getId());
+
+            ps.executeUpdate();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        
+        // display success message
+        JOptionPane.showMessageDialog(this, "The account has been deleted successfully\n\nReturning to dashboard");
+        
+        // return to dashboard
+        Dashboard d = new Dashboard(loggedIn);
+        d.setVisible(true);
+        this.dispose();
+ 
+
     }//GEN-LAST:event_deleteTaskButtonActionPerformed
 
     /**

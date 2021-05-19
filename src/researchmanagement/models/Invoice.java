@@ -11,10 +11,11 @@ package researchmanagement.models;
  */
 public class Invoice {
     private int id;
-    private int customerID;
-    private int projectID;
-    private float amountPaid;
-    private float amountOwed;
+    private int customerId;
+    private int projectId;
+    private String date;
+    private String amountPaid;
+    private String amountOwed;
     private String paymentSchedule;
 
     /**
@@ -22,14 +23,16 @@ public class Invoice {
      * @param id
      * @param customerID
      * @param projectID
+     * @param date
      * @param amountPaid
      * @param amountOwed
      * @param paymentSchedule
      */
-    public Invoice(int id, int customerID, int projectID, float amountPaid, float amountOwed, String paymentSchedule) {
+    public Invoice(int id, int customerID, int projectID, String date, String amountPaid, String amountOwed, String paymentSchedule) {
         this.id = id;
-        this.customerID = customerID;
-        this.projectID = projectID;
+        this.customerId = customerID;
+        this.projectId = projectID;
+        this.date = date;
         this.amountPaid = amountPaid;
         this.amountOwed = amountOwed;
         this.paymentSchedule = paymentSchedule;
@@ -43,35 +46,35 @@ public class Invoice {
         this.id = id;
     }
 
-    public int getCustomerID() {
-        return customerID;
+    public int getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomerID(int customerID) {
-        this.customerID = customerID;
+    public void setCustomerId(int customerID) {
+        this.customerId = customerID;
     }
 
-    public int getProjectID() {
-        return projectID;
+    public int getProjectId() {
+        return projectId;
     }
 
-    public void setProjectID(int projectID) {
-        this.projectID = projectID;
+    public void setProjectId(int projectID) {
+        this.projectId = projectID;
     }
 
-    public float getAmountPaid() {
+    public String getAmountPaid() {
         return amountPaid;
     }
 
-    public void setAmountPaid(float amountPaid) {
+    public void setAmountPaid(String amountPaid) {
         this.amountPaid = amountPaid;
     }
 
-    public float getAmountOwed() {
+    public String getAmountOwed() {
         return amountOwed;
     }
 
-    public void setAmountOwed(float amountOwed) {
+    public void setAmountOwed(String amountOwed) {
         this.amountOwed = amountOwed;
     }
 
@@ -82,6 +85,12 @@ public class Invoice {
     public void setPaymentSchedule(String paymentSchedule) {
         this.paymentSchedule = paymentSchedule;
     }
-         
-    
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 }

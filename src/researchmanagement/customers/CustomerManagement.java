@@ -23,6 +23,7 @@ import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
 import researchmanagement.models.Customer;
+import researchmanagement.models.Project;
 
 /**
  *
@@ -33,6 +34,8 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
     private Account loggedIn;
     private Customer selectedCustomer;
     private ArrayList<Customer> customers;
+    private ArrayList<Project> projects;
+    
     /**
      * Creates new form AccountManagement
      */
@@ -42,10 +45,9 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
             this.dispose();
         }
         initComponents();
-        
+                this.loggedIn = loggedIn;
+                
         loadCustomers();
-        
-        this.loggedIn = loggedIn;
     }
 
     /**
@@ -128,20 +130,20 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
         jLabel2.setText("Name");
 
         nameLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        nameLabel.setText("Name");
+        nameLabel.setText("null");
         nameLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         DOBLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        DOBLabel.setText("01/02/2000");
+        DOBLabel.setText("null");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel7.setText("Date of Birth");
 
         requestedProjectsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Requested Projects"));
-        requestedProjectsPanel.setLayout(new javax.swing.BoxLayout(requestedProjectsPanel, javax.swing.BoxLayout.LINE_AXIS));
+        requestedProjectsPanel.setLayout(new javax.swing.BoxLayout(requestedProjectsPanel, javax.swing.BoxLayout.Y_AXIS));
 
         emailLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        emailLabel.setText("email@e.com");
+        emailLabel.setText("null");
         emailLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -251,6 +253,11 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
     }//GEN-LAST:event_dashboardButtonActionPerformed
 
     private void editCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editCustomerButtonActionPerformed
+        if (selectedCustomer == null){
+            JOptionPane.showMessageDialog(this, "You must select an customer to edit it.\n\nPlease try again");
+            return;
+        }
+        
         // Load the edit customer page
         EditCustomer ec = new EditCustomer(loggedIn, selectedCustomer);
         ec.setVisible(true);
@@ -259,7 +266,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
 
     private void deleteCustomerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteCustomerButtonActionPerformed
         if (selectedCustomer == null){
-            JOptionPane.showMessageDialog(this, "You must select an account to delete it.\n\nPlease try again");
+            JOptionPane.showMessageDialog(this, "You must select a customer to delete it.\n\nPlease try again");
             return;
         }
         
@@ -434,6 +441,8 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
                 nameLabel.setText(selectedCustomer.getFirstName() + " " + selectedCustomer.getLastName());
                 emailLabel.setText(selectedCustomer.getEmail());
                 DOBLabel.setText(selectedCustomer.getDOB());
+                
+                loadProjects();
             } else{
                 JOptionPane.showMessageDialog(this, "There has been a problem retrieving this account\n\nPlease try again");
             }
@@ -451,5 +460,71 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
             l.setVisible(true);
             this.dispose();
         }
+    }
+
+    private void loadProjects() {
+        // Refresh/create array list to store all projects
+        projects = new ArrayList<Project>();
+        
+        // Sql string
+        String sqlGetProjects = "SELECT * FROM tbl_projects WHERE CustomerID=? ";
+        
+        // try catch to handle database querying
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlGetProjects)){
+            
+            ps.setInt(1, selectedCustomer.getId());
+            
+            // Store results from query in a resultset
+            ResultSet rs = ps.executeQuery();
+            
+            // loop through all results and store the account in the project list
+            while (rs.next()){
+                Project project = new Project(rs.getInt("ProjectID"), rs.getString("Name"),rs.getString("Status"),rs.getInt("CustomerID"),rs.getInt("HeadResearcherID"));
+                projects.add(project);
+            }
+            
+            // close resultset and preparedstatment
+            rs.close();
+        } catch (Exception e){
+            // display error message
+            JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+ 
+            // relaunch login page
+            Login l = new Login();
+            l.setVisible(true);
+            this.dispose();
+        }
+            
+        // clear the panel
+        requestedProjectsPanel.removeAll();
+        System.out.println(customers.size() + " accounts found");
+
+        if (projects.size() == 0){
+            JLabel notice = new JLabel("There are currently 0 projects for this customer");
+            requestedProjectsPanel.add(notice);
+        } else {
+            for(Project project : projects){
+                // create a new row
+                JPanel row = new JPanel(new GridLayout(1,2));
+                row.setMaximumSize(new Dimension(500,30));              
+
+
+                // name label to hold the customers name
+                JLabel name = new JLabel(project.getName(), SwingConstants.LEFT);
+                name.setSize(200, 20);
+
+                // Button to select the account
+                JLabel status = new JLabel(project.getStatus(), SwingConstants.LEFT);
+                status.setSize(200, 20);
+
+                row.add(name);
+                row.add(status);
+                requestedProjectsPanel.add(row);
+            }
+        }
+        requestedProjectsPanel.validate();
+        requestedProjectsPanel.repaint();
+        requestedProjectsPanel.setVisible(true);    
     }
 }

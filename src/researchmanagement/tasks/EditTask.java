@@ -305,28 +305,30 @@ public class EditTask extends javax.swing.JFrame {
 
     private void saveTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTaskButtonActionPerformed
         // prepare sql string
-        String sqlInsert = "INSERT INTO tbl_tasks (Name, Status, ProjectID, AccountID) VALUES (?, ?, ?, ?)";
+        String sqlUpdate = "UPDATE tbl_tasks SET Name=?, ProjectID=?, AccountID=? WHERE TaskID=?";
             
         // Insert the customer into the database
         try (Connection conn = Database.Connect();
-                PreparedStatement insertPs = conn.prepareStatement(sqlInsert)){
+                PreparedStatement updatePs = conn.prepareStatement(sqlUpdate)){
 
             System.out.println(nameField.getText());
             
             // prepare sql with values
-            insertPs.setString(1, nameField.getText());
-            insertPs.setString(2, "In Progress");
+            updatePs.setString(1, nameField.getText());
             
             // retrieve selected customer and head researcher
             ComboBoxItem project = (ComboBoxItem) projectSelection.getSelectedItem();
             ComboBoxItem researcher = (ComboBoxItem) accountSelection.getSelectedItem();
             
             // add IDs to prepared statement
-            insertPs.setInt(3, project.getId()); 
-            insertPs.setInt(4, researcher.getId());
+            updatePs.setInt(2, project.getId()); 
+            updatePs.setInt(3, researcher.getId());
             
+            // add task id to preparedstatement
+            updatePs.setInt(4, taskToEdit.getId());
+                    
             // execute the sql query
-            int row = insertPs.executeUpdate();
+            int row = updatePs.executeUpdate();
             System.out.println("Task inserted into row " + row);
                   
             JOptionPane.showMessageDialog(null, "Create Successful!\n\nReturning to Dashboard");
@@ -346,7 +348,7 @@ public class EditTask extends javax.swing.JFrame {
     }//GEN-LAST:event_nameFieldActionPerformed
 
     private void projectSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projectSelectionActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_projectSelectionActionPerformed
 
     /**

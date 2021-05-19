@@ -16,6 +16,14 @@ public class Task {
     private int projectId;
     private int accountId;
 
+    /**
+     *
+     * @param id
+     * @param name
+     * @param status
+     * @param projectId
+     * @param accountId
+     */
     public Task(int id, String name, String status, int projectId, int accountId) {
         this.id = id;
         this.name = name;

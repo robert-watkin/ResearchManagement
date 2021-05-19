@@ -23,7 +23,6 @@ import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
 
-// TODO if the loggedIn account is changed on the DB then update it while using the software
 
 /**
  *
@@ -131,22 +130,22 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
         jLabel2.setText("Name");
 
         nameLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        nameLabel.setText("Name");
+        nameLabel.setText("null");
 
         roleLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        roleLabel.setText("Researcher");
+        roleLabel.setText("null");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel5.setText("Role");
 
         DOBLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        DOBLabel.setText("01/02/2000");
+        DOBLabel.setText("null");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel7.setText("Date of Birth");
 
         emailLabel.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        emailLabel.setText("test@test.com");
+        emailLabel.setText("null");
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel9.setText("Email");
@@ -264,7 +263,7 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
     private void editAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editAccountButtonActionPerformed
         // Check if an account has been selected
         if (selectedAccount == null){
-            JOptionPane.showMessageDialog(this, "You must select an account to delete it.\n\nPlease try again");
+            JOptionPane.showMessageDialog(this, "You must select an account to edit it.\n\nPlease try again");
             return;
         }
         

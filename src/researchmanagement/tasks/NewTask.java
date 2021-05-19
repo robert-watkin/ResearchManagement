@@ -324,7 +324,7 @@ public class NewTask extends javax.swing.JFrame {
     }//GEN-LAST:event_nameFieldActionPerformed
 
     private void projectSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projectSelectionActionPerformed
-        // TODO add your handling code here:
+        // not used
     }//GEN-LAST:event_projectSelectionActionPerformed
 
     /**
