@@ -16,7 +16,6 @@ import researchmanagement.models.Account;
 import researchmanagement.models.Project;
 import researchmanagement.models.Task;
 
-// TODO deleting a task must remove ALL notes for that task and redirect to dashboard
 
 /**
  *
@@ -51,6 +50,11 @@ public class ViewTask extends javax.swing.JFrame {
         this.taskId = taskId;
         this.loggedIn = loggedIn;
 
+        if (loggedIn.getRole().equals("Researcher")){
+            editTaskButton.setEnabled(false);
+            deleteTaskButton.setEnabled(false);
+            
+        }
         getTask();
         setLabels();
         loadNotes();
@@ -81,6 +85,7 @@ public class ViewTask extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         researcherLabel = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
+        updateStatusButton = new javax.swing.JButton();
         editTaskButton = new javax.swing.JButton();
         addNoteButton = new javax.swing.JButton();
         deleteTaskButton = new javax.swing.JButton();
@@ -165,6 +170,13 @@ public class ViewTask extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel6.setText("Researcher");
 
+        updateStatusButton.setText("Mark as \"Complete Requiring Review\"");
+        updateStatusButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateStatusButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -172,20 +184,23 @@ public class ViewTask extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(headResearcherLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(researcherLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(projectNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
-                    .addComponent(taskStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
+                    .addComponent(updateStatusButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                            .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(headResearcherLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(researcherLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(projectNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
+                            .addComponent(taskStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -210,7 +225,9 @@ public class ViewTask extends javax.swing.JFrame {
                 .addComponent(jLabel9)
                 .addGap(2, 2, 2)
                 .addComponent(taskStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(72, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addComponent(updateStatusButton)
+                .addContainerGap())
         );
 
         editTaskButton.setText("Edit");
@@ -332,7 +349,7 @@ public class ViewTask extends javax.swing.JFrame {
         String sqlDeleteTask = "DELETE FROM tbl_tasks WHERE TaskID=?";
 
         // user confirmation to delete the account
-        int reply = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this account?\n\nThis cannot be undone!", "Warning!", JOptionPane.YES_NO_OPTION);
+        int reply = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this task?\n\nThis cannot be undone!", "Warning!", JOptionPane.YES_NO_OPTION);
 
         if (reply == JOptionPane.YES_OPTION) {   
             // try with resource for database querying
@@ -345,9 +362,11 @@ public class ViewTask extends javax.swing.JFrame {
                 ps.executeUpdate();
                 
             } catch (Exception e){
-                JOptionPane.showMessageDialog(this, "There has been an error deleting this account\n"+e+"\nPlease try again");
+                JOptionPane.showMessageDialog(this, "There has been an error deleting this task\n"+e+"\nPlease try again");
                 return;
             }
+        } else {
+            return;
         }
         
         // Delete tasks
@@ -364,6 +383,8 @@ public class ViewTask extends javax.swing.JFrame {
             e.printStackTrace();
         }
         
+        
+        
         // display success message
         JOptionPane.showMessageDialog(this, "The account has been deleted successfully\n\nReturning to dashboard");
         
@@ -374,6 +395,34 @@ public class ViewTask extends javax.swing.JFrame {
  
 
     }//GEN-LAST:event_deleteTaskButtonActionPerformed
+
+    private void updateStatusButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateStatusButtonActionPerformed
+        String sqlUpdateStatus = "UPDATE tbl_tasks SET Status=? WHERE TaskID=?";
+        
+        
+        // try with resource for database querying
+        try(Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlUpdateStatus)){
+            
+            // input data to prepared statement
+            if (selectedTask.getStatus().equals("In Progress")){
+                ps.setString(1, "Complete Requiring Review");
+            } else {
+                ps.setString(1, "Complete");
+                
+            }
+            ps.setInt(2, selectedTask.getId());
+            
+            ps.executeUpdate();
+            
+            getTask();
+            setLabels();
+            
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(this, "There has been an error updating this task\n\nPlease try again");
+            return;
+        }
+    }//GEN-LAST:event_updateStatusButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -433,6 +482,7 @@ public class ViewTask extends javax.swing.JFrame {
     private javax.swing.JPanel taskNotesPanel;
     private javax.swing.JScrollPane taskPane;
     private javax.swing.JLabel taskStatusLabel;
+    private javax.swing.JButton updateStatusButton;
     // End of variables declaration//GEN-END:variables
 
     
@@ -534,8 +584,55 @@ public class ViewTask extends javax.swing.JFrame {
             this.dispose();
         }
         
-        headResearcherLabel.setText(String.valueOf(project.getHeadResearcherId()));
+        // Get head researcher
+         // get researcher (account)
+        String sqlGetHeadResearcher = "SELECT * FROM tbl_accounts WHERE AccountID=?";
+        Account headResearcher = null;
+        
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlGetHeadResearcher)){
+            
+            ps.setInt(1, project.getHeadResearcherId());
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){
+                headResearcher = new Account(rs.getInt("AccountID"), rs.getString("FirstName"), rs.getString("LastName"), rs.getString("Email"), rs.getString("Role"), rs.getString("DOB"));
+            }
+            else {
+                JOptionPane.showMessageDialog(this, "There has been an error retreiving the head researcher\n\nReturning to dashboard");
+            
+                Dashboard d = new Dashboard(loggedIn);
+                d.setVisible(true);
+                this.dispose();
+            }
+            
+            rs.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "There has been an error retreiving the head researcher\n\nReturning to dashboard");
+            
+            Dashboard d = new Dashboard(loggedIn);
+            d.setVisible(true);
+            this.dispose();
+        }
+        
+        headResearcherLabel.setText(headResearcher.getFirstName() + " " + headResearcher.getLastName());
+        
         projectNameLabel.setText(project.getName());
+        
+        // Determing button functionality and text for updating status
+        if (selectedTask.getStatus().equals("In Progress")){
+            if (!loggedIn.getRole().equals("Researcher") && !loggedIn.getRole().equals("System Administrator")){
+                updateStatusButton.setEnabled(false);
+            }
+        } else if (selectedTask.getStatus().equals("Complete Requiring Review")) {
+            updateStatusButton.setText("Mark as \"Complete\"");
+            if (!loggedIn.getRole().equals("Head Researcher") && !loggedIn.getRole().equals("System Administrator")){
+                updateStatusButton.setEnabled(false);
+            }
+        } else {
+            updateStatusButton.setVisible(false);
+        }
     }
 
     private void loadNotes() {

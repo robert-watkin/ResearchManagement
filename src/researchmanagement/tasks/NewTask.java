@@ -89,14 +89,26 @@ public class NewTask extends javax.swing.JFrame {
             d.setVisible(true);
             this.dispose();
         }
-            
-        String sqlGetProjects = "SELECT * FROM tbl_projects";
-       
+         
+        
+        String sqlGetProjects;
+        
+        if (loggedIn.getRole().equals("Head Researcher")){
+            sqlGetProjects = "SELECT * FROM tbl_projects WHERE Status<>? AND HeadResearcherID'";
+        } else {
+            sqlGetProjects = "SELECT * FROM tbl_projects WHERE Status<>?";
+        }
+        
         // Try with resource for database query
         try (Connection conn = Database.Connect();
                 // prepare statement to run
                 PreparedStatement ps = conn.prepareStatement(sqlGetProjects)){
                 
+                ps.setString(1, "Signed Off");
+            
+                if (loggedIn.getRole().equals("Head Researcher")){
+                    ps.setInt(2, loggedIn.getId());
+                }
                 // result set to store customers
                 ResultSet rs = ps.executeQuery();
                 
@@ -106,7 +118,7 @@ public class NewTask extends javax.swing.JFrame {
                 // Check for 0 projects
                 if (!rs.isBeforeFirst()){
                     // Display error message
-                    JOptionPane.showMessageDialog(this, "Cannot create task as there are no projects\n\nReturning to Dashboard");
+                    JOptionPane.showMessageDialog(this, "Cannot create task as there are no active projects\n\nReturning to Dashboard");
 
                     // return to dashboard screen
                     Dashboard d = new Dashboard(loggedIn);
@@ -282,6 +294,40 @@ public class NewTask extends javax.swing.JFrame {
     }//GEN-LAST:event_accountSelectionActionPerformed
 
     private void createTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createTaskButtonActionPerformed
+        ComboBoxItem researcher = (ComboBoxItem) accountSelection.getSelectedItem();
+
+        // check researcher has no more than 10 tasks assigned already
+        String sqlGetTaskCount = "SELECT COUNT(*) FROM tbl_tasks WHERE AccountID=? AND status<>?";
+        
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlGetTaskCount);){
+
+            // Prepare statement with researcherID input
+            ps.setInt(1, researcher.getId());
+            ps.setString(2, "Complete");
+            
+            // execute sql
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){ // if there are any results
+                int count = rs.getInt(1); // get the count of the results
+                rs.close();
+                
+                // if count >= 10 then the researcher already has too many tasks
+                if (count >= 10){
+                    JOptionPane.showMessageDialog(this, "The researcher already has the maximum of 10 tasks assigned to them\n\nPlease choose a different researcher");
+
+                    return;
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
+                return;
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
+            return;
+        }
+
         // prepare sql string
         String sqlInsert = "INSERT INTO tbl_tasks (Name, Status, ProjectID, AccountID) VALUES (?, ?, ?, ?)";
             
@@ -297,7 +343,6 @@ public class NewTask extends javax.swing.JFrame {
             
             // retrieve selected customer and head researcher
             ComboBoxItem project = (ComboBoxItem) projectSelection.getSelectedItem();
-            ComboBoxItem researcher = (ComboBoxItem) accountSelection.getSelectedItem();
             
             // add IDs to prepared statement
             insertPs.setInt(3, project.getId()); 

@@ -195,7 +195,7 @@
                 <StringItem index="0" value="Researcher"/>
                 <StringItem index="1" value="Head Researcher"/>
                 <StringItem index="2" value="System Administrator"/>
-                <StringItem index="3" value="Office Admin"/>
+                <StringItem index="3" value="Office Administrator"/>
               </StringArray>
             </Property>
           </Properties>

@@ -27,7 +27,7 @@ public class EditInvoice extends javax.swing.JFrame {
 
     private Account loggedIn;
     private DefaultComboBoxModel customerModel = new DefaultComboBoxModel();
-    private DefaultComboBoxModel projectModel = new DefaultComboBoxModel();
+    private DefaultComboBoxModel taskModel = new DefaultComboBoxModel();
     private Invoice invoiceToEdit;
     
     /**
@@ -103,7 +103,7 @@ public class EditInvoice extends javax.swing.JFrame {
         }
             
         // SQL string to get all projects
-        String sqlGetProjects = "SELECT * FROM tbl_projects";
+        String sqlGetProjects = "SELECT * FROM tbl_tasks";
         
         // Try with resource for database query
         try (Connection conn = Database.Connect();
@@ -114,12 +114,12 @@ public class EditInvoice extends javax.swing.JFrame {
                 ResultSet rs = ps.executeQuery();
                 
                 // remove all from the combo box
-                this.projectSelection.removeAll();
+                this.taskSelection.removeAll();
                 
                 // Check for 0 projects
                 if (!rs.isBeforeFirst()){
                     // Display error message
-                    JOptionPane.showMessageDialog(this, "Cannot create invoices as there are no projects\n\nReturning to Invoice Management screen");
+                    JOptionPane.showMessageDialog(this, "Cannot create invoices as there are no tasks\n\nReturning to Invoice Management screen");
 
                     // return to invoice management screen
                     InvoiceManagement im = new InvoiceManagement(loggedIn);
@@ -129,22 +129,22 @@ public class EditInvoice extends javax.swing.JFrame {
                 
                 // loop through projects and add to model
                 while (rs.next()){
-                    projectModel.addElement(new ComboBoxItem(rs.getInt("ProjectID"), rs.getString("Name")));
+                    taskModel.addElement(new ComboBoxItem(rs.getInt("ProjectID"), rs.getString("Name")));
                 }
                 
-                // loop to set selected project to the current project of the invoice
-                for (int i = 0; i < projectModel.getSize(); i++){
-                    ComboBoxItem project = (ComboBoxItem) projectModel.getElementAt(i);
-                    if (project.getId() == invoiceToEdit.getProjectId()){
-                        projectModel.setSelectedItem(project);
+                // loop to set selected task to the current task of the invoice
+                for (int i = 0; i < taskModel.getSize(); i++){
+                    ComboBoxItem task = (ComboBoxItem) taskModel.getElementAt(i);
+                    if (task.getId() == invoiceToEdit.getTaskId()){
+                        taskModel.setSelectedItem(task);
                     }
                 }
                 
                 // add model to the combo box
-                this.projectSelection.setModel(projectModel);
+                this.taskSelection.setModel(taskModel);
         } catch (Exception e){
             // Display error message
-            JOptionPane.showMessageDialog(this, "An error has occured while retrieving projects\n\n" + e);
+            JOptionPane.showMessageDialog(this, "An error has occured while retrieving tasks\n\n" + e);
             
             // return to invoice management screen
             InvoiceManagement im = new InvoiceManagement(loggedIn);
@@ -172,7 +172,7 @@ public class EditInvoice extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        projectSelection = new javax.swing.JComboBox<>();
+        taskSelection = new javax.swing.JComboBox<>();
         customerSelection = new javax.swing.JComboBox<>();
         jLabel10 = new javax.swing.JLabel();
         amountOwedField = new javax.swing.JFormattedTextField();
@@ -197,12 +197,17 @@ public class EditInvoice extends javax.swing.JFrame {
         jLabel5.setText("Customer");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel6.setText("Project");
+        jLabel6.setText("Task");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel7.setText("Amount Owed (e.g £12.34)");
 
-        projectSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        taskSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        taskSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                taskSelectionActionPerformed(evt);
+            }
+        });
 
         customerSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         customerSelection.addActionListener(new java.awt.event.ActionListener() {
@@ -243,7 +248,7 @@ public class EditInvoice extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(projectSelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(taskSelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(customerSelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(amountOwedField, javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(amountPaidField)
@@ -263,7 +268,7 @@ public class EditInvoice extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel6)
                 .addGap(2, 2, 2)
-                .addComponent(projectSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(taskSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel7)
                 .addGap(2, 2, 2)
@@ -344,7 +349,7 @@ public class EditInvoice extends javax.swing.JFrame {
 
     private void createInvoiceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createInvoiceButtonActionPerformed
         // prepare sql string  
-        String sqlUpdate = "UPDATE tbl_invoices SET Date=?, AmountOwed=?, AmountPaid=?, PaymentSchedule=?, CustomerID=?, ProjectID=? WHERE InvoiceID=?";           
+        String sqlUpdate = "UPDATE tbl_invoices SET Date=?, AmountOwed=?, AmountPaid=?, PaymentSchedule=?, CustomerID=?, TaskID=? WHERE InvoiceID=?";           
             
         // Insert the customer into the database
         try (Connection conn = Database.Connect();
@@ -361,13 +366,13 @@ public class EditInvoice extends javax.swing.JFrame {
             insertPs.setString(3, String.valueOf(amountPaidField.getText())); // dates stored as string as SQLite does not have a date datatype
             insertPs.setString(4, String.valueOf(paymentSelection.getSelectedItem()));
             
-            // get the selected customer and project from the combo boxes
+            // get the selected customer and task from the combo boxes
             ComboBoxItem customer = (ComboBoxItem) customerSelection.getSelectedItem();
-            ComboBoxItem project = (ComboBoxItem) projectSelection.getSelectedItem();
+            ComboBoxItem task = (ComboBoxItem) taskSelection.getSelectedItem();
             
-            // insert customer and project id into prepared statement
+            // insert customer and task id into prepared statement
             insertPs.setInt(5, customer.getId());
-            insertPs.setInt(6, project.getId());
+            insertPs.setInt(6, task.getId());
 
             // add id to prepared statement
             insertPs.setInt(7, invoiceToEdit.getId());
@@ -391,6 +396,10 @@ public class EditInvoice extends javax.swing.JFrame {
     private void amountPaidFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amountPaidFieldActionPerformed
         // not used
     }//GEN-LAST:event_amountPaidFieldActionPerformed
+
+    private void taskSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskSelectionActionPerformed
+        // not used
+    }//GEN-LAST:event_taskSelectionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -445,6 +454,6 @@ public class EditInvoice extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JComboBox<String> paymentSelection;
-    private javax.swing.JComboBox<String> projectSelection;
+    private javax.swing.JComboBox<String> taskSelection;
     // End of variables declaration//GEN-END:variables
 }

@@ -179,6 +179,8 @@ public class EditCustomer extends javax.swing.JFrame {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void createAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createAccountButtonActionPerformed
+        
+
         // email format validation
         if (!Pattern.matches("^[a-zA-Z0-9]+[@]{1}+[a-zA-Z0-9]+[.]{1}+[a-zA-Z0-9]+$", emailField.getText())){
             JOptionPane.showMessageDialog(this, "The inputted email address is invalid!\n\nPlease try again...");

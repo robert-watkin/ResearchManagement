@@ -16,14 +16,18 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
 import researchmanagement.accounts.AccountManagement;
 import researchmanagement.customers.CustomerManagement;
 import researchmanagement.invoices.InvoiceManagement;
@@ -35,7 +39,6 @@ import researchmanagement.projects.NewProject;
 import researchmanagement.tasks.NewTask;
 import researchmanagement.tasks.ViewTask;
 
-// TODO display project status and allow the status to be changed appropriately
 
 /**
  *
@@ -56,31 +59,32 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     /**
      * Creates new form Dashboard
      */
-    public Dashboard(Account acc) {
+    public Dashboard(Account loggedIn) {
         // If the dashboard is opened without a succesful login attempt
-        if (acc.getId() == -1){
+        if (loggedIn.getId() == -1){
             this.dispose();
         }
         
         initComponents();
         
         // Set the logged in user to the account passed through
-        loggedIn = acc;
+        this.loggedIn = loggedIn;
         
         // display logged in user name
         nameLabel.setText("Hello, " + loggedIn.getFirstName() + " (" + loggedIn.getRole() + ")");
      
         // Load projects        
-        if (loggedIn.getRole().equals("Head Researcher") || loggedIn.getRole().equals("System Administrator")){
+        if (loggedIn.getRole().equals("Head Researcher") || loggedIn.getRole().equals("System Administrator") || loggedIn.getRole().equals("Office Administrator")){
             loadProjects();
         } else {
-            JLabel notice = new JLabel("You can only view projects as a Head Researcher or System Admin");
+            JLabel notice = new JLabel("<html>You can only view projects as a Head Researcher or System Admin.<br />To view which project your task is associate with,<br /> click view next to the task</html>");
             yourProjectsPanel.add(notice);
         }
          
         
         loadTasks();
         loadQuote();
+        setButtonPermissions();
     }
 
     public Dashboard() {
@@ -100,7 +104,6 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         nameLabel = new javax.swing.JLabel();
         quoteLabel = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
         yourProjectsPanel = new javax.swing.JPanel();
         newProjectButton = new javax.swing.JButton();
         editProjectButton = new javax.swing.JButton();
@@ -109,9 +112,8 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         accountManagementButton = new javax.swing.JButton();
         customerManagementButton = new javax.swing.JButton();
         invoiceManagementButton = new javax.swing.JButton();
-        completedTasksButton = new javax.swing.JButton();
+        completedProjectsAndTasksButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
         yourTasksPanel = new javax.swing.JPanel();
         newTaskButton = new javax.swing.JButton();
         signOutButton = new javax.swing.JButton();
@@ -126,7 +128,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         jPanel1.setMaximumSize(new java.awt.Dimension(600, 200));
 
         nameLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        nameLabel.setText("Hello, Robert (System Administrator)");
+        nameLabel.setText("Hello, null (null)");
 
         quoteLabel.setEditable(false);
         quoteLabel.setBackground(new java.awt.Color(200, 200, 200));
@@ -159,10 +161,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
         jPanel2.setMaximumSize(new java.awt.Dimension(394, 432));
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel3.setText("Your Projects");
-
-        yourProjectsPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        yourProjectsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Your Projects"));
         yourProjectsPanel.setLayout(new javax.swing.BoxLayout(yourProjectsPanel, javax.swing.BoxLayout.Y_AXIS));
 
         newProjectButton.setText("New Project");
@@ -209,7 +208,12 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             }
         });
 
-        completedTasksButton.setText("Completed Tasks");
+        completedProjectsAndTasksButton.setText("Completed Projects & Tasks");
+        completedProjectsAndTasksButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                completedProjectsAndTasksButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -222,7 +226,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(customerManagementButton, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
-                    .addComponent(completedTasksButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(completedProjectsAndTasksButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, 0))
         );
         jPanel4Layout.setVerticalGroup(
@@ -234,7 +238,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(invoiceManagementButton)
-                    .addComponent(completedTasksButton)))
+                    .addComponent(completedProjectsAndTasksButton)))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -246,23 +250,20 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(newProjectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(yourProjectsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(editProjectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(deleteProjectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(deleteProjectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(newProjectButton))
+                .addComponent(newProjectButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(yourProjectsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -274,10 +275,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel4.setText("Your Tasks");
-
-        yourTasksPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        yourTasksPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Your Tasks"));
         yourTasksPanel.setLayout(new javax.swing.BoxLayout(yourTasksPanel, javax.swing.BoxLayout.Y_AXIS));
 
         newTaskButton.setText("New Task");
@@ -303,19 +301,17 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(yourTasksPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(190, 190, 190)
-                        .addComponent(newTaskButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(signOutButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(newTaskButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(signOutButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(newTaskButton)
-                    .addComponent(jLabel4))
+                .addComponent(newTaskButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(yourTasksPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 324, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -341,7 +337,8 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
 
         pack();
@@ -427,6 +424,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 
                 ps.setInt(1, selectedProject);
 
+                
                 ps.executeUpdate();
                 
                 tasksDeleted = true;
@@ -504,6 +502,13 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         this.dispose();
     }//GEN-LAST:event_invoiceManagementButtonActionPerformed
 
+    private void completedProjectsAndTasksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_completedProjectsAndTasksButtonActionPerformed
+        CompletedTasksAndProjects ctp = new CompletedTasksAndProjects(loggedIn);
+        ctp.setVisible(true);
+        
+        this.dispose();
+    }//GEN-LAST:event_completedProjectsAndTasksButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -541,13 +546,11 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton accountManagementButton;
-    private javax.swing.JButton completedTasksButton;
+    private javax.swing.JButton completedProjectsAndTasksButton;
     private javax.swing.JButton customerManagementButton;
     private javax.swing.JButton deleteProjectButton;
     private javax.swing.JButton editProjectButton;
     private javax.swing.JButton invoiceManagementButton;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -566,13 +569,19 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         projects = new ArrayList<Project>();
         String sqlGetProjects = "";
         
+        // print user role for debug purposes
+        System.out.println(loggedIn.getRole());
+        
         // allow for ALL projects to be shown to system admins
-        if (loggedIn.getRole().equals("System Administrator")){
+        if (loggedIn.getRole().equals("System Administrator") || loggedIn.getRole().equals("Office Administrator")){
               // Sql string
-            sqlGetProjects = "SELECT * FROM tbl_projects";
+            sqlGetProjects = "SELECT * FROM tbl_projects WHERE Status<>?";
+            yourProjectsPanel.setBorder(new TitledBorder("All Projects"));
         } else{
+            
             // Sql string
-            sqlGetProjects = "SELECT * FROM tbl_projects WHERE HeadResearcherID=?";
+            sqlGetProjects = "SELECT * FROM tbl_projects WHERE Status<>? AND HeadResearcherID=?";
+            System.out.println(sqlGetProjects);
         }
         
      
@@ -580,8 +589,11 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         try (Connection conn = Database.Connect();
                 PreparedStatement ps = conn.prepareStatement(sqlGetProjects)){
             
-            if (!loggedIn.getRole().equals("System Administrator")){
-                ps.setInt(1, loggedIn.getId());
+            if (!loggedIn.getRole().equals("System Administrator") && !loggedIn.getRole().equals("Office Administrator") ){
+                ps.setString(1, "Signed Off");
+                ps.setInt(2, loggedIn.getId());
+            } else {
+                ps.setString(1, "Signed Off");
             }
             
             // Store results from query in a resultset
@@ -610,18 +622,26 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         System.out.println(projects.size() + " projects found");
         
         if (projects.size() == 0){
-            JLabel notice = new JLabel("You currently have 0 projects");
+            JLabel notice = new JLabel("You currently have 0 active projects");
             yourProjectsPanel.add(notice);
         } else {
             for(Project project : projects){
                 // create a new row
-                JPanel row = new JPanel(new GridLayout(1,2));
+                JPanel row = new JPanel(new GridLayout(1,3));
                 row.setMaximumSize(new Dimension(500,30));              
 
 
                 // name label to hold the accounts name
                 JLabel name = new JLabel(project.getName(), SwingConstants.LEFT);
                 name.setSize(200, 20);
+                
+                JButton signOff = new JButton("Sign Off");
+                signOff.setActionCommand("Sign Off,"+project.getId());
+                signOff.addActionListener(this);
+                
+                if (!loggedIn.getRole().equals("Head Researcher") && !loggedIn.getRole().equals("System Administrator")){
+                    signOff.setEnabled(false);
+                }
 
                 // Button to select the account
                 JButton select = new JButton("Select");
@@ -630,6 +650,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
                 // Add elements to the row
                 row.add(name);
+                row.add(signOff);
                 row.add(select);
                 yourProjectsPanel.add(row);
             }
@@ -646,42 +667,87 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         
         String sqlGetTasks = "";
         
-        if (loggedIn.getRole().equals("System Administrator")){
+        // determine which tasks to show
+        if (loggedIn.getRole().equals("System Administrator")  || loggedIn.getRole().equals("Office Administrator")){
+            // if the user is a system or office admin, display all tasks
              // Sql string
-             sqlGetTasks = "SELECT * FROM tbl_tasks";
+             sqlGetTasks = "SELECT * FROM tbl_tasks WHERE Status<>?";
+             yourTasksPanel.setBorder(new TitledBorder("All Tasks"));
+             
+        } else if (loggedIn.getRole().equals("Head Researcher")){
+            // if the user is a head researcher, loop through projects and find all associating tasks
+            
+            for (Project project : projects){
+                sqlGetTasks = "SELECT * FROM tbl_tasks WHERE ProjectID=? AND Status<>?";
+                
+                // try catch to handle database querying
+                try (Connection conn = Database.Connect();
+                        PreparedStatement ps = conn.prepareStatement(sqlGetTasks)){
+
+                    ps.setInt(1, project.getId());
+                    ps.setString(2, "Complete");
+
+                    // Store results from query in a resultset
+                    ResultSet rs = ps.executeQuery();
+
+                    // loop through all results and store the account in the accountlist
+                    while (rs.next()){
+                        Task task = new Task(rs.getInt("TaskID"), rs.getString("Name"), rs.getString("Status"),rs.getInt("ProjectID"), rs.getInt("AccountID"));
+                        tasks.add(task);
+                    }
+
+                    // close resultset and preparedstatment
+                    rs.close();
+                } catch (Exception e){
+                    // display error message
+                    JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+
+                    // relaunch login page
+                    Login l = new Login();
+                    l.setVisible(true);
+                    this.dispose();
+                }
+            }
+            
         } else {
             // Sql string
-             sqlGetTasks = "SELECT * FROM tbl_tasks WHERE AccountID=?";
+             sqlGetTasks = "SELECT * FROM tbl_tasks WHERE AccountID=? AND Status<>?";
         }
         
         
-        // try catch to handle database querying
-        try (Connection conn = Database.Connect();
-                PreparedStatement ps = conn.prepareStatement(sqlGetTasks)){
-            
-            if (!loggedIn.getRole().equals("System Administrator")){
-                ps.setInt(1, loggedIn.getId());
+        // check if the user is a head researcher as the tasks have already been gathered earlier in this function
+        if (!loggedIn.getRole().equals("Head Researcher")){
+            // try catch to handle database querying
+            try (Connection conn = Database.Connect();
+                    PreparedStatement ps = conn.prepareStatement(sqlGetTasks)){
+
+                if (!loggedIn.getRole().equals("System Administrator") && !loggedIn.getRole().equals("Office Administrator")){
+                    ps.setInt(1, loggedIn.getId());
+                    ps.setString(2, "Complete");
+                } else {
+                    ps.setString(1, "Complete");
+                }
+
+                // Store results from query in a resultset
+                ResultSet rs = ps.executeQuery();
+
+                // loop through all results and store the account in the accountlist
+                while (rs.next()){
+                    Task task = new Task(rs.getInt("TaskID"), rs.getString("Name"), rs.getString("Status"),rs.getInt("ProjectID"), rs.getInt("AccountID"));
+                    tasks.add(task);
+                }
+
+                // close resultset and preparedstatment
+                rs.close();
+            } catch (Exception e){
+                // display error message
+                JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
+
+                // relaunch login page
+                Login l = new Login();
+                l.setVisible(true);
+                this.dispose();
             }
-            
-            // Store results from query in a resultset
-            ResultSet rs = ps.executeQuery();
-            
-            // loop through all results and store the account in the accountlist
-            while (rs.next()){
-                Task task = new Task(rs.getInt("TaskID"), rs.getString("Name"), rs.getString("Status"),rs.getInt("ProjectID"), rs.getInt("AccountID"));
-                tasks.add(task);
-            }
-            
-            // close resultset and preparedstatment
-            rs.close();
-        } catch (Exception e){
-            // display error message
-            JOptionPane.showMessageDialog(this,"An error has occured!\n\n" + e);
- 
-            // relaunch login page
-            Login l = new Login();
-            l.setVisible(true);
-            this.dispose();
         }
             
         // clear the panel
@@ -691,7 +757,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         // if there are 0 tasks
         if (tasks.size() == 0){
             // Display 0 tasks to the user
-            JLabel notice = new JLabel("You currently have 0 tasks");
+            JLabel notice = new JLabel("You currently have 0 active tasks");
             yourTasksPanel.add(notice);
         } else {
             // Loop through all tasks
@@ -724,12 +790,13 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
     
     @Override
     public void actionPerformed(ActionEvent ae) {
-            String action = ae.getActionCommand();
-            System.out.println("Button pressed");
-            
+        String action = ae.getActionCommand();
+        System.out.println("Button pressed");
+
+        try {
             int val = Integer.parseInt(action);
             System.out.println(val);
-            
+
             if (val > 0){
                 selectedProject = val;
 
@@ -746,11 +813,61 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 selectedProjectButton.setEnabled(false);
             } else {
                 int taskId = val*-1;
-                
+
                 ViewTask vt = new ViewTask(loggedIn, taskId);
                 this.dispose();
             }
-            
+        } catch (Exception e){
+            // split action by ,
+            var values = action.split(",");
+            int projectId = Integer.parseInt(values[1]);
+
+            // Check all tasks are complete, if not then prevent sign off
+            boolean canSignOff = true;
+            for (Task task : tasks){
+                if (task.getProjectId() == projectId){
+                    // Ceck all tasks are complete
+                    if (!task.getStatus().equals("Complete")){
+                        canSignOff = false;
+                    } 
+                }
+            }
+
+            // if the signed in user is system admin then allow them
+            if (!loggedIn.getRole().equals("System Administrator")){
+                for (Project project : projects){
+                    if (project.getId() == projectId){
+                        // Check all tasks are complete
+                        if (project.getHeadResearcherId() != loggedIn.getId()){
+                            canSignOff = false;
+                        } 
+                    }
+                }
+            }
+            // If canSignOff then update the projects status
+            if (canSignOff){
+                // sql string to update project
+                String sqlUpdateStatus = "UPDATE tbl_projects SET Status=? WHERE ProjectID=?";
+
+                // try with resource for database querying
+                try (Connection conn = Database.Connect();
+                        PreparedStatement ps = conn.prepareStatement(sqlUpdateStatus)){
+
+                    // input values to prepared statement
+                    ps.setString(1, "Signed Off");
+                    ps.setInt(2, projectId);
+                    ps.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(this, "The project has been signed off succesfully");
+                    loadProjects();
+                    loadTasks();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "There has been an error signing off this project\n\nReturning to dashboard");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "This project cannot be signed off until all tasks are complete\n\nReturning to dashboard");
+            }
+        }
     }
 
     private void loadQuote() {
@@ -760,6 +877,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             throw new NullPointerException("Cannot find resource file " + resourceName);
         }
         
+    
         JSONTokener tokener = new JSONTokener(is);
         JSONObject object = new JSONObject(tokener);
         
@@ -769,7 +887,34 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         int quoteNum = rand.nextInt(quotes.length());        
         JSONObject j = (JSONObject) quotes.get(quoteNum);
         
+        // set label text
         quoteLabel.setText("Quote of the Day: \""+j.getString("quote")+'"');
        
+    }
+
+    private void setButtonPermissions() {
+        
+        switch (loggedIn.getRole()){
+            
+            case "Head Researcher":
+                accountManagementButton.setEnabled(false);
+                invoiceManagementButton.setEnabled(false);
+                customerManagementButton.setEnabled(false);
+                break;
+            case "Researcher":
+                editProjectButton.setEnabled(false);
+                deleteProjectButton.setEnabled(false);
+                newProjectButton.setEnabled(false);
+                newTaskButton.setEnabled(false);
+                accountManagementButton.setEnabled(false);
+                invoiceManagementButton.setEnabled(false);
+                customerManagementButton.setEnabled(false);
+                break;
+            case "Office Administrator":
+                accountManagementButton.setEnabled(false);
+                newTaskButton.setEnabled(false);
+                break;
+                
+        }
     }
 }

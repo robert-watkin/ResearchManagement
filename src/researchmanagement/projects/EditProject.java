@@ -305,6 +305,42 @@ public class EditProject extends javax.swing.JFrame {
     }//GEN-LAST:event_customerSelectionActionPerformed
 
     private void saveProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveProjectButtonActionPerformed
+        ComboBoxItem headResearcher = (ComboBoxItem) headResearcherSelection.getSelectedItem();
+
+        
+        // check head researcher has no more than 3 projects assigned already
+        String sqlGetProjectCount = "SELECT COUNT(*) FROM tbl_projects WHERE HeadResearcherID=? AND Status<>?";
+        
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlGetProjectCount);){
+
+            // Prepare statement with head researcherID  input
+            ps.setInt(1, headResearcher.getId());
+            ps.setString(2, "Signed Off");
+  
+            // execute sql
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){ // if there are any results
+                int count = rs.getInt(1); // get the count of the results
+                rs.close();
+                
+                // if count >= 1 then the email has been taken and the user cannot sign up
+                if (count >= 3){
+                    JOptionPane.showMessageDialog(this, "The head researcher already has the maximum of 3 projects assigned to them\n\nPlease choose a different head researcher");
+
+                    return;
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
+                return;
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
+            return;
+        }
+
+
         // prepare sql string  
         String sqlUpdate = "UPDATE tbl_projects SET Name=?, CustomerID=?, HeadResearcherID=? WHERE ProjectID=?";           
                 
@@ -319,7 +355,6 @@ public class EditProject extends javax.swing.JFrame {
             
             // retrieve selected customer and head researcher
             ComboBoxItem customer = (ComboBoxItem) customerSelection.getSelectedItem();
-            ComboBoxItem headResearcher = (ComboBoxItem) headResearcherSelection.getSelectedItem();
             
             // add IDs to prepared statement
             insertPs.setInt(2, customer.getId()); 

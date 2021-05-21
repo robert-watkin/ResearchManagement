@@ -12,7 +12,7 @@ package researchmanagement.models;
 public class Invoice {
     private int id;
     private int customerId;
-    private int projectId;
+    private int taskId;
     private String date;
     private String amountPaid;
     private String amountOwed;
@@ -21,17 +21,17 @@ public class Invoice {
     /**
      *
      * @param id
-     * @param customerID
-     * @param projectID
+     * @param customerId
+     * @param taskId
      * @param date
      * @param amountPaid
      * @param amountOwed
      * @param paymentSchedule
      */
-    public Invoice(int id, int customerID, int projectID, String date, String amountPaid, String amountOwed, String paymentSchedule) {
+    public Invoice(int id, int customerId, int taskId, String date, String amountPaid, String amountOwed, String paymentSchedule) {
         this.id = id;
-        this.customerId = customerID;
-        this.projectId = projectID;
+        this.customerId = customerId;
+        this.taskId = taskId;
         this.date = date;
         this.amountPaid = amountPaid;
         this.amountOwed = amountOwed;
@@ -54,12 +54,12 @@ public class Invoice {
         this.customerId = customerID;
     }
 
-    public int getProjectId() {
-        return projectId;
+    public int getTaskId() {
+        return taskId;
     }
 
-    public void setProjectId(int projectID) {
-        this.projectId = projectID;
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
     }
 
     public String getAmountPaid() {

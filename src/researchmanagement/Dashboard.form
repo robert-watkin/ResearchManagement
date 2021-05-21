@@ -51,6 +51,7 @@
                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                   <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace pref="48" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -96,7 +97,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Tahoma" size="12" style="1"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Hello, Robert (System Administrator)"/>
+            <Property name="text" type="java.lang.String" value="Hello, null (null)"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextArea" name="quoteLabel">
@@ -135,16 +136,15 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jPanel4" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Component id="jLabel3" min="-2" pref="90" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           <Component id="newProjectButton" min="-2" pref="100" max="-2" attributes="0"/>
                       </Group>
                       <Component id="yourProjectsPanel" max="32767" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
                           <Component id="editProjectButton" min="-2" pref="184" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="deleteProjectButton" max="32767" attributes="0"/>
+                          <Component id="deleteProjectButton" pref="180" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -155,10 +155,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="newProjectButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="newProjectButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="yourProjectsPanel" min="-2" pref="228" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
@@ -174,19 +171,11 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel3">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Tahoma" size="12" style="0"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Your Projects"/>
-          </Properties>
-        </Component>
         <Container class="javax.swing.JPanel" name="yourProjectsPanel">
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-              <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
-                <EtchetBorder/>
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Your Projects"/>
               </Border>
             </Property>
           </Properties>
@@ -239,7 +228,7 @@
                       <EmptySpace max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="customerManagementButton" pref="176" max="32767" attributes="0"/>
-                          <Component id="completedTasksButton" max="32767" attributes="0"/>
+                          <Component id="completedProjectsAndTasksButton" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                   </Group>
@@ -255,7 +244,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="invoiceManagementButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="completedTasksButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="completedProjectsAndTasksButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -286,10 +275,13 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="invoiceManagementButtonActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="completedTasksButton">
+            <Component class="javax.swing.JButton" name="completedProjectsAndTasksButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Completed Tasks"/>
+                <Property name="text" type="java.lang.String" value="Completed Projects &amp; Tasks"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="completedProjectsAndTasksButtonActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -304,11 +296,12 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="yourTasksPanel" max="32767" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jLabel4" min="-2" pref="90" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="190" max="-2" attributes="0"/>
-                          <Component id="newTaskButton" min="-2" pref="100" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="newTaskButton" alignment="1" min="-2" pref="100" max="-2" attributes="0"/>
+                              <Component id="signOutButton" alignment="1" min="-2" pref="100" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <Component id="signOutButton" alignment="1" min="-2" pref="100" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -318,10 +311,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="newTaskButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="newTaskButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="yourTasksPanel" min="-2" pref="324" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -332,19 +322,11 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel4">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Tahoma" size="12" style="0"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Your Tasks"/>
-          </Properties>
-        </Component>
         <Container class="javax.swing.JPanel" name="yourTasksPanel">
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-              <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
-                <EtchetBorder/>
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Your Tasks"/>
               </Border>
             </Property>
           </Properties>

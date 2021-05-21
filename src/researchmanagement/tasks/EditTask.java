@@ -304,6 +304,40 @@ public class EditTask extends javax.swing.JFrame {
     }//GEN-LAST:event_accountSelectionActionPerformed
 
     private void saveTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTaskButtonActionPerformed
+        ComboBoxItem researcher = (ComboBoxItem) accountSelection.getSelectedItem();
+
+        // check researcher has no more than 10 tasks assigned already
+        String sqlGetTaskCount = "SELECT COUNT(*) FROM tbl_tasks WHERE AccountID=? AND status<>?";
+        
+        try (Connection conn = Database.Connect();
+                PreparedStatement ps = conn.prepareStatement(sqlGetTaskCount);){
+
+            // Prepare statement with researcherID input
+            ps.setInt(1, researcher.getId());
+            ps.setString(2, "Complete");
+            
+            // execute sql
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){ // if there are any results
+                int count = rs.getInt(1); // get the count of the results
+                rs.close();
+                
+                // if count >= 10 then the researcher already has too many tasks
+                if (count >= 10){
+                    JOptionPane.showMessageDialog(this, "The researcher already has the maximum of 10 tasks assigned to them\n\nPlease choose a different researcher");
+
+                    return;
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
+                return;
+            }
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
+            return;
+        }
+
         // prepare sql string
         String sqlUpdate = "UPDATE tbl_tasks SET Name=?, ProjectID=?, AccountID=? WHERE TaskID=?";
             
@@ -318,7 +352,6 @@ public class EditTask extends javax.swing.JFrame {
             
             // retrieve selected customer and head researcher
             ComboBoxItem project = (ComboBoxItem) projectSelection.getSelectedItem();
-            ComboBoxItem researcher = (ComboBoxItem) accountSelection.getSelectedItem();
             
             // add IDs to prepared statement
             updatePs.setInt(2, project.getId()); 
