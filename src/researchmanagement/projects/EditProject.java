@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import researchmanagement.Audit;
 import researchmanagement.Dashboard;
 import researchmanagement.Database;
 import researchmanagement.Login;
@@ -105,6 +106,7 @@ public class EditProject extends javax.swing.JFrame {
             d.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Select");
         
         // Set name
         this.nameField.setText(projectToEdit.getName());
@@ -159,6 +161,7 @@ public class EditProject extends javax.swing.JFrame {
             d.setVisible(true);
             this.dispose();
         }   
+        Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Select");
     }
 
     /**
@@ -339,6 +342,7 @@ public class EditProject extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
             return;
         }
+        Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Select (Count)");
 
 
         // prepare sql string  
@@ -370,6 +374,7 @@ public class EditProject extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save project!\n\nError: " + e);
         }
+        Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Update");
         
         // return to dashboard screen
         Dashboard d = new Dashboard(loggedIn);
@@ -469,5 +474,6 @@ public class EditProject extends javax.swing.JFrame {
             d.setVisible(true);
             this.dispose();
         }   
+        Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Select");
     }
 }

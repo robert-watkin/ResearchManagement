@@ -146,12 +146,14 @@ public class Login extends javax.swing.JFrame {
             // create an account object to hold the logged in users details
             acc = new Account(rs.getInt("AccountID"),rs.getString("FirstName"),rs.getString("LastName"),rs.getString("Email"),rs.getString("Role"), rs.getString("DOB"));
             
+            
             rs.close();
         } catch(Exception e){
             JOptionPane.showMessageDialog(this, "An error has occured!\n\n"+e);
-
+            return;
         }     
 
+        Audit.Update("tbl_accounts", acc.getId(), acc.getFirstName(), "Select (Logged In)");
         
         // Launch dashboard and pass through the logged in account
         Dashboard d = new Dashboard(acc);

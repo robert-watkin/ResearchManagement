@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import researchmanagement.Audit;
 import researchmanagement.Dashboard;
 import researchmanagement.Database;
 import researchmanagement.Login;
@@ -88,6 +89,7 @@ public class NewProject extends javax.swing.JFrame {
             d.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Select");
             
         // SQL string to get all accounts that are head admins
         String sqlGetAccounts = "SELECT * FROM tbl_accounts WHERE role = 'Head Researcher'";
@@ -130,6 +132,7 @@ public class NewProject extends javax.swing.JFrame {
             d.setVisible(true);
             this.dispose();
         }   
+        Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Select");
     }
 
     /**
@@ -310,6 +313,7 @@ public class NewProject extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
             return;
         }
+        Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Select (Count)");
 
         // prepare sql string
         String sqlInsert = "INSERT INTO tbl_projects (Name, Status, CustomerID, HeadResearcherID) VALUES (?, ?, ?, ?)";               
@@ -340,6 +344,7 @@ public class NewProject extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save customer!\n\nError: " + e);
         }
+        Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Insert");
         
         // return to dashboard screen
         Dashboard d = new Dashboard(loggedIn);

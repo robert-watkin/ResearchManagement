@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import researchmanagement.Audit;
 import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
@@ -90,6 +91,7 @@ public class NewInvoice extends javax.swing.JFrame {
             im.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Select");
             
         // SQL string to get all tasks
         String sqlGetTasks = "SELECT * FROM tbl_tasks";
@@ -132,6 +134,7 @@ public class NewInvoice extends javax.swing.JFrame {
             im.setVisible(true);
             this.dispose();
         }   
+        Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Select");
     }
 
     /**
@@ -363,6 +366,7 @@ public class NewInvoice extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save invoice!\n\nError: " + e);
         }
+        Audit.Update("tbl_invoices", loggedIn.getId(), loggedIn.getFirstName(), "Insert");
         
         // Return to invoice management screen
         InvoiceManagement im = new InvoiceManagement(loggedIn);

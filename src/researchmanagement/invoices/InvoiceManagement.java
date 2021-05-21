@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import researchmanagement.Audit;
 import researchmanagement.Dashboard;
 import researchmanagement.Database;
 import researchmanagement.Login;
@@ -396,6 +397,7 @@ public class InvoiceManagement extends javax.swing.JFrame implements ActionListe
             } catch (Exception e){
                 e.printStackTrace();
             }
+            Audit.Update("tbl_invoices", loggedIn.getId(), loggedIn.getFirstName(), "Delete");
         }
         loadInvoices();
     }//GEN-LAST:event_deleteInvoiceButtonActionPerformed
@@ -504,6 +506,7 @@ public class InvoiceManagement extends javax.swing.JFrame implements ActionListe
             l.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_invoices", loggedIn.getId(), loggedIn.getFirstName(), "Select");
         
         // clear the panel
         allInvoicesPanel.removeAll();
@@ -582,6 +585,7 @@ public class InvoiceManagement extends javax.swing.JFrame implements ActionListe
             l.setVisible(true);
             this.dispose();
         }   
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Select");
         
         // SQL string
         String sqlGetTask = "SELECT * FROM tbl_tasks WHERE TaskID=?";
@@ -613,6 +617,7 @@ public class InvoiceManagement extends javax.swing.JFrame implements ActionListe
             l.setVisible(true);
             this.dispose();
         }   
+        Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Select");
         
         // figure out total cost for project
         // get all tasks associated with the project
@@ -643,6 +648,7 @@ public class InvoiceManagement extends javax.swing.JFrame implements ActionListe
             l.setVisible(true);
             this.dispose();
         }   
+        Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Select");
         
         float total = 0;
         

@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import researchmanagement.Audit;
 import researchmanagement.Dashboard;
 import researchmanagement.Database;
 import researchmanagement.Login;
@@ -288,6 +289,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
             } catch (Exception e){
                 e.printStackTrace();
             }
+            Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Delete");
         }
         loadCustomers();
     }//GEN-LAST:event_deleteCustomerButtonActionPerformed
@@ -368,6 +370,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
             l.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Select");
             
         // clear the panel
         allCustomersPanel.removeAll();
@@ -460,6 +463,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
             l.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Select");
     }
 
     private void loadProjects() {
@@ -495,6 +499,7 @@ public class CustomerManagement extends javax.swing.JFrame implements ActionList
             l.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Select");
             
         // clear the panel
         requestedProjectsPanel.removeAll();

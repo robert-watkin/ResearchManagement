@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JTextArea;
 import javax.swing.JOptionPane;
+import researchmanagement.Audit;
 import researchmanagement.Dashboard;
 import researchmanagement.Database;
 import researchmanagement.models.Account;
@@ -338,6 +339,7 @@ public class ViewTask extends javax.swing.JFrame {
             d.setVisible(true);
             this.dispose();
         } 
+        Audit.Update("tbl_notes", loggedIn.getId(), loggedIn.getFirstName(), "Insert");
         
         
         
@@ -365,6 +367,7 @@ public class ViewTask extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "There has been an error deleting this task\n"+e+"\nPlease try again");
                 return;
             }
+            Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Delete");
         } else {
             return;
         }
@@ -382,7 +385,7 @@ public class ViewTask extends javax.swing.JFrame {
         } catch (Exception e){
             e.printStackTrace();
         }
-        
+        Audit.Update("tbl_notes", loggedIn.getId(), loggedIn.getFirstName(), "Delete");
         
         
         // display success message
@@ -422,6 +425,7 @@ public class ViewTask extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "There has been an error updating this task\n\nPlease try again");
             return;
         }
+        Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Update");
     }//GEN-LAST:event_updateStatusButtonActionPerformed
 
     /**

@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import researchmanagement.Audit;
 import researchmanagement.Dashboard;
 import researchmanagement.Database;
 import researchmanagement.Login;
@@ -298,8 +299,9 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
                 ps.executeUpdate();
                 JOptionPane.showMessageDialog(this, "The account has been deleted successfully");
             } catch (Exception e){
-                e.printStackTrace();
+                return;
             }
+            Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Delete");
         }
         loadAccounts();
     }//GEN-LAST:event_deleteAccountButtonActionPerformed
@@ -378,6 +380,7 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
             l.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Select");
             
         // clear the panel
         allAccountsPanel.removeAll();
@@ -469,5 +472,6 @@ public class AccountManagement extends javax.swing.JFrame implements ActionListe
                 l.setVisible(true);
                 this.dispose();
             }
+            Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Select");
     }
 }

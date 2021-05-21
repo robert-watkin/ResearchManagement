@@ -20,8 +20,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -81,6 +79,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             yourProjectsPanel.add(notice);
         }
          
+
         
         loadTasks();
         loadQuote();
@@ -117,6 +116,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         yourTasksPanel = new javax.swing.JPanel();
         newTaskButton = new javax.swing.JButton();
         signOutButton = new javax.swing.JButton();
+        auditButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(800, 500));
@@ -293,6 +293,13 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             }
         });
 
+        auditButton.setText("View Audit Trail");
+        auditButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                auditButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -304,7 +311,10 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(newTaskButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(signOutButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                                .addComponent(auditButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(signOutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -315,7 +325,9 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(yourTasksPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 324, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(signOutButton)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(signOutButton)
+                    .addComponent(auditButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -377,15 +389,19 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             try (Connection conn = Database.Connect();
                     PreparedStatement ps = conn.prepareStatement(sqlDeleteProject)){
                 
+                // insert values to prepared statement
                 ps.setInt(1, selectedProject);
+                
+                // execute the prepared statement
                 ps.executeUpdate();
                 
                 projectDeleted = true;
                 
             } catch (Exception e){
-                e.printStackTrace();
+                return;
             }
-            
+            Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Delete");
+
             
             // get task ID for deleting notes
             int[] taskIds = {};
@@ -394,7 +410,10 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             try (Connection conn = Database.Connect();
                     PreparedStatement ps = conn.prepareStatement(sqlGetTaskID)){
                 
+                // insert values to prepared statement
                 ps.setInt(1, selectedProject);
+                
+                // execute prepared statement
                 ResultSet rs = ps.executeQuery();
                 
                 boolean isTasks = false;
@@ -412,9 +431,10 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 }
                 
             } catch (Exception e){
-                e.printStackTrace();
+                return;
             }
-            
+            Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Select");
+
             // delete tasks
             boolean tasksDeleted = false;
             String sqlDeleteTasks = "DELETE FROM tbl_tasks WHERE ProjectID=?";
@@ -422,9 +442,10 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             try (Connection conn = Database.Connect();
                     PreparedStatement ps = conn.prepareStatement(sqlDeleteTasks)){
                 
+                // insert values to prepared statement
                 ps.setInt(1, selectedProject);
 
-                
+                // execute prepared statment
                 ps.executeUpdate();
                 
                 tasksDeleted = true;
@@ -432,6 +453,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             } catch (Exception e){
                 e.printStackTrace();
             }
+            Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Deleted");
             
             // delete task notse
             if (tasksDeleted){
@@ -441,14 +463,15 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                     try (Connection conn = Database.Connect();
                             PreparedStatement ps = conn.prepareStatement(sqlDeleteNote)){
 
+                        // insert values to prepared statement
                         ps.setInt(1, id);
 
+                        // execute prepared statement
                         ps.executeUpdate();
-                        
-                        
                     } catch (Exception e){
                         e.printStackTrace();
                     }
+                    Audit.Update("tbl_notes", loggedIn.getId(), loggedIn.getFirstName(), "Deleted");
                 }
             }
             
@@ -509,6 +532,13 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
         this.dispose();
     }//GEN-LAST:event_completedProjectsAndTasksButtonActionPerformed
 
+    private void auditButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditButtonActionPerformed
+        // navigate to audit trail page
+        ViewAuditLog val = new ViewAuditLog(loggedIn);
+        val.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_auditButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -546,6 +576,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton accountManagementButton;
+    private javax.swing.JButton auditButton;
     private javax.swing.JButton completedProjectsAndTasksButton;
     private javax.swing.JButton customerManagementButton;
     private javax.swing.JButton deleteProjectButton;
@@ -599,6 +630,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             // Store results from query in a resultset
             ResultSet rs = ps.executeQuery();
             
+            
             // loop through all results and store the account in the accountlist
             while (rs.next()){
                 Project project = new Project(rs.getInt("ProjectID"), rs.getString("Name"), rs.getString("Status"),rs.getInt("CustomerID"), rs.getInt("HeadResearcherID"));
@@ -616,6 +648,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
             l.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Select");
             
         // clear the panel
         yourProjectsPanel.removeAll();
@@ -689,6 +722,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
 
                     // Store results from query in a resultset
                     ResultSet rs = ps.executeQuery();
+                    
 
                     // loop through all results and store the account in the accountlist
                     while (rs.next()){
@@ -707,6 +741,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                     l.setVisible(true);
                     this.dispose();
                 }
+                Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Select");
             }
             
         } else {
@@ -748,6 +783,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 l.setVisible(true);
                 this.dispose();
             }
+            Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Select");
         }
             
         // clear the panel
@@ -864,6 +900,7 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this, "There has been an error signing off this project\n\nReturning to dashboard");
                 }
+                Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Update");
             } else {
                 JOptionPane.showMessageDialog(this, "This project cannot be signed off until all tasks are complete\n\nReturning to dashboard");
             }
@@ -900,6 +937,8 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 accountManagementButton.setEnabled(false);
                 invoiceManagementButton.setEnabled(false);
                 customerManagementButton.setEnabled(false);
+                this.auditButton.setEnabled(false);
+                this.auditButton.setVisible(false);
                 break;
             case "Researcher":
                 editProjectButton.setEnabled(false);
@@ -909,10 +948,14 @@ public class Dashboard extends javax.swing.JFrame implements ActionListener{
                 accountManagementButton.setEnabled(false);
                 invoiceManagementButton.setEnabled(false);
                 customerManagementButton.setEnabled(false);
+                this.auditButton.setEnabled(false);
+                this.auditButton.setVisible(false);
                 break;
             case "Office Administrator":
                 accountManagementButton.setEnabled(false);
                 newTaskButton.setEnabled(false);
+                this.auditButton.setEnabled(false);
+                this.auditButton.setVisible(false);
                 break;
                 
         }

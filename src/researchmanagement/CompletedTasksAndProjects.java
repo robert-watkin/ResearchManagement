@@ -128,13 +128,15 @@ public class CompletedTasksAndProjects extends javax.swing.JFrame implements Act
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(643, 643, 643)
+                        .addComponent(jButton1)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(completedProjectsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20)
-                        .addComponent(completedTasksPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(completedTasksPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -221,6 +223,8 @@ public class CompletedTasksAndProjects extends javax.swing.JFrame implements Act
             // Store results from query in a resultset
             ResultSet rs = ps.executeQuery();
             
+
+            
             // loop through all results and store the project in the project list
             while (rs.next()){
                 Project project = new Project(rs.getInt("ProjectID"), rs.getString("Name"), rs.getString("Status"), rs.getInt("CustomerID"), rs.getInt("HeadResearcherID"));
@@ -238,6 +242,7 @@ public class CompletedTasksAndProjects extends javax.swing.JFrame implements Act
             d.setVisible(true);
             this.dispose();
         }
+        Audit.Update("tbl_projects", loggedIn.getId(), loggedIn.getFirstName(), "Select");
         
         // clear the panel
         completedProjectsPanel.removeAll();
@@ -291,7 +296,7 @@ public class CompletedTasksAndProjects extends javax.swing.JFrame implements Act
 
                 ps.setInt(1, val);
                 ResultSet rs = ps.executeQuery();
-
+                
                 while (rs.next()){
                     Task task = new Task(rs.getInt("TaskID"), rs.getString("Name"), rs.getString("Status"),rs.getInt("ProjectID"), rs.getInt("AccountID"));
                     tasks.add(task);
@@ -300,6 +305,7 @@ public class CompletedTasksAndProjects extends javax.swing.JFrame implements Act
             } catch (SQLException ex) {
                  JOptionPane.showMessageDialog(this, "There has been an error retrieving tasks for this project\n\nPlease try again!");
             }
+            Audit.Update("tbl_tasks", loggedIn.getId(), loggedIn.getFirstName(), "Select");
 
             // clear the panel
             completedTasksPanel.removeAll();

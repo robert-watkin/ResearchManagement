@@ -9,10 +9,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import researchmanagement.Audit;
 import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
@@ -283,6 +282,7 @@ public class NewAccount extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
             return;
         }
+        Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Select (Count)");
         
         // Ensure the password fields match
         if (!Arrays.equals(passwordField.getPassword(), confirmPasswordField.getPassword())){
@@ -314,6 +314,7 @@ public class NewAccount extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save account!\n\nError: " + e);
         }
+        Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Insert");
 
         AccountManagement am = new AccountManagement(loggedIn);
         am.setVisible(true);

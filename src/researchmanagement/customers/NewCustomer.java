@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import researchmanagement.Audit;
 import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
@@ -219,7 +220,7 @@ public class NewCustomer extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
             return;
         }
-        
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Select (Count)");
         
         // prepare sql string
         String sqlInsert = "INSERT INTO tbl_customers (FirstName, LastName, DOB, Email) VALUES (?, ?, ?, ?)";
@@ -243,6 +244,7 @@ public class NewCustomer extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save customer!\n\nError: " + e);
         }
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Insert");
 
         CustomerManagement cm = new CustomerManagement(loggedIn);
         cm.setVisible(true);

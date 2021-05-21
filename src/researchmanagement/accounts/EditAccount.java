@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import researchmanagement.Audit;
 import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
@@ -271,6 +272,7 @@ public class EditAccount extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
             return;
         }
+        Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Select (Count)");
         
         boolean passwordChange = false;
         // Ensure the password fields match
@@ -316,6 +318,7 @@ public class EditAccount extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save account!\n\nError: " + e);
         }
+        Audit.Update("tbl_accounts", loggedIn.getId(), loggedIn.getFirstName(), "Update");
         
         // check if the edited account is the account logged in
         if (accToEdit.getId() == loggedIn.getId()){

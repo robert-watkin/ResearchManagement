@@ -8,11 +8,9 @@ package researchmanagement.customers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
-import researchmanagement.accounts.*;
-import researchmanagement.Dashboard;
+import researchmanagement.Audit;
 import researchmanagement.Database;
 import researchmanagement.Login;
 import researchmanagement.models.Account;
@@ -224,6 +222,7 @@ public class EditCustomer extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "An error has occured.\n\n Please try again");
             return;
         }
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Select (Count)");
         
         String sqlUpdate = "UPDATE tbl_customers SET FirstName=?, LastName=?, Email=?, DOB=? WHERE customerId=?";           
                 
@@ -247,6 +246,7 @@ public class EditCustomer extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cannot save customer!\n\nError: " + e);
         }
+        Audit.Update("tbl_customers", loggedIn.getId(), loggedIn.getFirstName(), "Update");
 
         CustomerManagement cm = new CustomerManagement(loggedIn);
         cm.setVisible(true);
